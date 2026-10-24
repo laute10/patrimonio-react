@@ -406,6 +406,10 @@ button {
   z-index: 100;
 }
 
+.overlay--alto {
+  z-index: 299;
+}
+
 .overlay--visible {
   opacity: 1;
   pointer-events: auto;

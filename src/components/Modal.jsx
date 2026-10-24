@@ -10,7 +10,7 @@ import Overlay from "./Overlay";
 function Modal({ titulo, descripcion, onCerrar, conCerrar = false, ancho, children }) {
   return (
     <>
-      <Overlay visible={true} onClick={onCerrar} />
+      <Overlay visible={true} alto onClick={onCerrar} />
       <div
         className="modal"
         role="dialog"

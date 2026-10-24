@@ -506,6 +506,8 @@ function Tarjetas({
 
       {/* ---------- Modales de confirmación (textos del diseño en Figma) ---------- */}
       {modal === "cerrar" && periodoResumen && (
+        <>
+        <Overlay visible alto onClick={cerrarModal} />
         <div className="modal">
           <div className="modal__contenido">
             <p className="modal__titulo">¿Cerrar período?</p>
@@ -523,9 +525,12 @@ function Tarjetas({
             </div>
           </div>
         </div>
+        </>
       )}
 
       {modal === "pagar" && periodoResumen && (
+        <>
+        <Overlay visible alto onClick={cerrarModal} />
         <div className="modal">
           <div className="modal__contenido">
             <p className="modal__titulo">¿Pagar período?</p>
@@ -544,9 +549,12 @@ function Tarjetas({
             </div>
           </div>
         </div>
+        </>
       )}
 
       {modal === "eliminar" && consumoAEliminar && (
+        <>
+        <Overlay visible alto onClick={cerrarModal} />
         <div className="modal">
           <div className="modal__contenido">
             <p className="modal__titulo">¿Eliminar consumo?</p>
@@ -573,6 +581,7 @@ function Tarjetas({
             </div>
           </div>
         </div>
+        </>
       )}
     </main>
   );

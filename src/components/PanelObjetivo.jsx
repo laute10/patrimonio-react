@@ -1,3 +1,4 @@
+import { IconoAvanzar } from "./Iconos";
 import { Fragment, useState } from "react";
 import Overlay from "./Overlay";
 import PanelLateral from "./PanelLateral";
@@ -170,7 +171,7 @@ function PanelObjetivo({
         <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => irA("retirar")}>Retirar dinero</button>
         <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => irA("utilizar")}>Utilizar dinero</button>
         <button type="button" className="detalle-objetivo__enlace" onClick={() => onVerMovimientos(objetivo.id)}>
-          Ver movimientos del objetivo →
+          Ver movimientos del objetivo <IconoAvanzar />
         </button>
       </Fragment>
     );

@@ -13,10 +13,12 @@ import { formatearMonto } from "../utils/formato";
 // mismo componente (FormularioMovimiento) con distintas props.
 // ==========================================================================
 
-const CATEGORIAS_GASTO = ["Supermercado", "Transporte", "Facultad", "Ocio"];
-const CATEGORIAS_INGRESO = ["Sueldo", "Freelance", "Regalo", "Otro"];
 
 function Inicio({
+  categoriasGasto,
+  agregarCategoria,
+  categoriasIngreso,
+  agregarCategoriaIngreso,
   patrimonioTotal,
   disponible,
   ahorrosTotal,
@@ -131,7 +133,8 @@ function Inicio({
         <FormularioMovimiento
           key={"gasto-" + version}
           id="form-gasto"
-          categorias={CATEGORIAS_GASTO}
+          categorias={categoriasGasto}
+          onNuevaCategoria={agregarCategoria}
           maximo={disponible}
           onRegistrar={manejarGasto}
         />
@@ -152,7 +155,8 @@ function Inicio({
         <FormularioMovimiento
           key={"ingreso-" + version}
           id="form-ingreso"
-          categorias={CATEGORIAS_INGRESO}
+          categorias={categoriasIngreso}
+          onNuevaCategoria={agregarCategoriaIngreso}
           onRegistrar={manejarIngreso}
         />
       </PanelLateral>

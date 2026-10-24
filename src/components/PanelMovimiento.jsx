@@ -4,8 +4,6 @@ import PanelLateral from "./PanelLateral";
 import Modal from "./Modal";
 import FormularioMovimiento from "./FormularioMovimiento";
 import {
-  CATEGORIAS_GASTO,
-  CATEGORIAS_INGRESO,
   clasificar,
   etiquetaClase,
   formatearMonto,
@@ -43,6 +41,10 @@ function Fila({ etiqueta, valor }) {
 }
 
 function PanelMovimiento({
+  categoriasGasto,
+  agregarCategoria,
+  categoriasIngreso,
+  agregarCategoriaIngreso,
   movimiento,
   disponible,
   tarjetas,
@@ -111,7 +113,8 @@ function PanelMovimiento({
         >
           <FormularioMovimiento
             id="form-editar-movimiento"
-            categorias={movimiento.tipo === "ingreso" ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO}
+            categorias={movimiento.tipo === "ingreso" ? categoriasIngreso : categoriasGasto}
+            onNuevaCategoria={movimiento.tipo === "ingreso" ? agregarCategoriaIngreso : agregarCategoria}
             maximo={movimiento.tipo === "gasto" ? disponible + movimiento.monto : undefined}
             inicial={{ categoria: movimiento.categoria, monto: movimiento.monto, descripcion: movimiento.descripcion }}
             onRegistrar={guardar}

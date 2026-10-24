@@ -2620,3 +2620,89 @@ input:focus-visible,
   gap: var(--espacio-2);
   margin-top: var(--espacio-3);
 }
+
+/* ==========================================================================
+   ÍCONOS SVG (volver, cerrar, avanzar, menú) y categorías propias
+   ========================================================================== */
+
+.icono {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Botones de ícono: área táctil de 36px con fondo suave al pasar el mouse */
+.panel__cerrar,
+.panel__volver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.panel__cerrar:hover,
+.panel__volver:hover {
+  background-color: var(--color-borde);
+}
+
+.panel__cerrar:focus-visible,
+.panel__volver:focus-visible {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 2px;
+}
+
+/* Enlaces con flecha al final ("Ver todos →") */
+.link:has(.icono),
+.link--boton:has(.icono),
+.panel__link:has(.icono) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}
+
+.link .icono {
+  transition: transform 0.15s ease;
+}
+
+.link:hover .icono {
+  transform: translateX(3px);
+}
+
+.filtro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}
+
+/* Selector de ícono: con 36 opciones la grilla se desplaza */
+.selector-icono__grilla {
+  grid-template-columns: repeat(6, 1fr);
+  max-height: 232px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.categoria-nueva {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+
+.categoria-nueva__acciones {
+  display: flex;
+  gap: var(--espacio-2);
+}
+
+.categoria-nueva__acciones .btn {
+  flex: 1;
+}
+
+.detalle-objetivo__enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}

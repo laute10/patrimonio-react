@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CampoFormulario from "./CampoFormulario";
+import SelectorCategoria from "./SelectorCategoria";
 
 // ==========================================================================
 // FormularioMovimiento - formulario controlado para registrar un gasto o un
@@ -8,7 +9,7 @@ import CampoFormulario from "./CampoFormulario";
 // Cada campo muestra su propio mensaje de error.
 // ==========================================================================
 
-function FormularioMovimiento({ id, categorias, maximo, onRegistrar, inicial }) {
+function FormularioMovimiento({ id, categorias, maximo, onRegistrar, inicial, onNuevaCategoria }) {
   const [categoria, setCategoria] = useState(inicial ? inicial.categoria : categorias[0]);
   const [monto, setMonto] = useState(inicial ? String(inicial.monto) : "");
   const [descripcion, setDescripcion] = useState(inicial ? inicial.descripcion : "");
@@ -37,13 +38,23 @@ function FormularioMovimiento({ id, categorias, maximo, onRegistrar, inicial }) 
 
   return (
     <form id={id} onSubmit={manejarEnvio} noValidate>
-      <CampoFormulario
-        id={id + "-categoria"}
-        etiqueta="Categoría"
-        opciones={categorias}
-        valor={categoria}
-        onCambio={setCategoria}
-      />
+      {onNuevaCategoria ? (
+        <SelectorCategoria
+          id={id + "-categoria"}
+          categorias={categorias}
+          valor={categoria}
+          onCambio={setCategoria}
+          onNueva={onNuevaCategoria}
+        />
+      ) : (
+        <CampoFormulario
+          id={id + "-categoria"}
+          etiqueta="Categoría"
+          opciones={categorias}
+          valor={categoria}
+          onCambio={setCategoria}
+        />
+      )}
       <CampoFormulario
         id={id + "-monto"}
         etiqueta="Monto"

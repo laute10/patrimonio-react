@@ -1,3 +1,5 @@
+import { IconoVolver, IconoCerrar } from "./Iconos";
+
 // ==========================================================================
 // PanelLateral - panel que se desliza desde la derecha (side panel).
 // Reemplaza al patrón "panel.classList.toggle('panel--abierto')" que
@@ -16,7 +18,7 @@ function PanelLateral({ abierto, titulo, descripcion, onCerrar, onVolver, childr
       <div className="panel__header">
         {onVolver ? (
           <button type="button" className="panel__volver" onClick={onVolver} aria-label="Volver">
-            ←
+            <IconoVolver />
           </button>
         ) : (
           titulo && <h2 className="panel__titulo">{titulo}</h2>
@@ -24,7 +26,7 @@ function PanelLateral({ abierto, titulo, descripcion, onCerrar, onVolver, childr
         <div className="panel__header-derecha">
           {extraHeader}
           <button type="button" className="panel__cerrar" onClick={onCerrar} aria-label="Cerrar">
-            X
+            <IconoCerrar />
           </button>
         </div>
       </div>

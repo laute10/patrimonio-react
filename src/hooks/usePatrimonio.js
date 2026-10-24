@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ICONOS } from "../utils/formato";
+import { ICONOS, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../utils/formato";
 
 // ==========================================================================
 // usePatrimonio - estado financiero compartido de toda la app.
@@ -72,6 +72,8 @@ function usePatrimonio() {
   const [objetivos, setObjetivos] = useState([]);
   const [tarjetas, setTarjetas] = useState([]);
   const [movimientos, setMovimientos] = useState([]);
+  const [categoriasPropias, setCategoriasPropias] = useState([]);
+  const [categoriasIngresoPropias, setCategoriasIngresoPropias] = useState([]);
 
   useEffect(() => {
     fetch("data/patrimonio.json")
@@ -409,6 +411,29 @@ function usePatrimonio() {
     return true;
   }
 
+  // Suma una categoría propia de gasto (si no existe ya, sin distinguir
+  // mayúsculas). Devuelve el nombre con el que quedó guardada.
+  function agregarCategoria(nombre) {
+    const limpio = nombre.trim();
+    const existente = [...CATEGORIAS_GASTO, ...categoriasPropias].find(
+      (c) => c.toLowerCase() === limpio.toLowerCase()
+    );
+    if (existente) return existente;
+    setCategoriasPropias([...categoriasPropias, limpio]);
+    return limpio;
+  }
+
+  // Igual que agregarCategoria, pero para las categorías de ingreso.
+  function agregarCategoriaIngreso(nombre) {
+    const limpio = nombre.trim();
+    const existente = [...CATEGORIAS_INGRESO, ...categoriasIngresoPropias].find(
+      (c) => c.toLowerCase() === limpio.toLowerCase()
+    );
+    if (existente) return existente;
+    setCategoriasIngresoPropias([...categoriasIngresoPropias, limpio]);
+    return limpio;
+  }
+
   return {
     // Estado de la carga de datos
     cargando,
@@ -420,6 +445,10 @@ function usePatrimonio() {
     reservaTarjeta,
     patrimonioTotal,
     // Datos
+    categoriasGasto: [...CATEGORIAS_GASTO, ...categoriasPropias],
+    agregarCategoria,
+    categoriasIngreso: [...CATEGORIAS_INGRESO, ...categoriasIngresoPropias],
+    agregarCategoriaIngreso,
     objetivos,
     tarjetas,
     movimientos,

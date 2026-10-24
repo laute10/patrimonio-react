@@ -22,10 +22,25 @@ export function clasificar(tipo) {
 }
 
 // Íconos disponibles para los objetivos de ahorro.
-export const ICONOS = ["🏠", "🚗", "✈️", "🎓", "💍", "🎯", "📱", "🏖️"];
+export const ICONOS = [
+  "🏠", "🚗", "✈️", "🎓", "💍", "🎯", "📱", "🏖️",
+  "💻", "🏍️", "🚲", "🎸", "🎮", "📷", "🛋️", "🔧",
+  "👶", "🐶", "🐱", "🏥", "💪", "⚽", "🎁", "🎉",
+  "🛒", "👕", "📚", "🍽️", "☕", "🌎", "⛰️", "🏕️",
+  "🛡️", "💰", "📈", "⭐",
+];
 
-export const CATEGORIAS_GASTO = ["Supermercado", "Transporte", "Facultad", "Ocio"];
-export const CATEGORIAS_INGRESO = ["Sueldo", "Freelance", "Regalo", "Otro"];
+// Categorías predeterminadas. Las de gasto sirven también para los consumos
+// de tarjeta; el usuario puede sumar las suyas desde el formulario.
+export const CATEGORIAS_GASTO = [
+  "Supermercado", "Transporte", "Facultad", "Ocio", "Comida", "Salud",
+  "Hogar", "Servicios", "Ropa", "Suscripciones", "Regalos", "Mascotas",
+  "Viajes", "Tecnología", "Educación", "Otros",
+];
+export const CATEGORIAS_INGRESO = [
+  "Sueldo", "Freelance", "Regalo", "Venta", "Reintegro", "Aguinaldo",
+  "Alquiler", "Beca", "Intereses", "Inversiones", "Bonos", "Otro",
+];
 
 // Etiqueta del tipo de movimiento para el detalle ("Ahorro", "Gasto"...).
 export function etiquetaClase(tipo) {

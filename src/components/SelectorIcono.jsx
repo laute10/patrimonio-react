@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { IconoChevron } from "./Iconos";
 import { ICONOS } from "../utils/formato";
 
 // ==========================================================================
@@ -20,7 +21,7 @@ function SelectorIcono({ valor, onCambio, textoBoton = "Seleccionar ícono" }) {
       >
         <span className="selector-icono__actual" aria-hidden="true">{valor}</span>
         <span className="selector-icono__texto">{textoBoton}</span>
-        <span aria-hidden="true">{abierto ? "↓" : "→"}</span>
+        <span aria-hidden="true"><IconoChevron abierto={abierto} /></span>
       </button>
 
       {abierto && (

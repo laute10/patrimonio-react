@@ -1,3 +1,4 @@
+import { IconoVolver, IconoAvanzar } from "../components/Iconos";
 import { useState } from "react";
 import Overlay from "../components/Overlay";
 import PanelLateral from "../components/PanelLateral";
@@ -160,7 +161,7 @@ function Ahorros({
           <div className="pagina-header__texto">
             <h1 className="titulo-con-volver">
               <button type="button" className="panel__volver" aria-label="Volver a Ahorros" onClick={() => setVista("resumen")}>
-                ←
+                <IconoVolver />
               </button>
               Todos los objetivos
             </h1>
@@ -258,7 +259,7 @@ function Ahorros({
         <div className="seccion-header">
           <h2>Mis objetivos</h2>
           {objetivos.length > 0 && (
-            <button type="button" className="link" onClick={() => setVista("todos")}>Ver todos →</button>
+            <button type="button" className="link" onClick={() => setVista("todos")}>Ver todos <IconoAvanzar /></button>
           )}
         </div>
 
@@ -281,7 +282,7 @@ function Ahorros({
         <div className="seccion-header">
           <h2>Movimientos recientes</h2>
           {movimientosDeAhorro.length > 0 && (
-            <button type="button" className="link" onClick={() => onVerMovimientos({ tipo: "ahorro" })}>Ver todos →</button>
+            <button type="button" className="link" onClick={() => onVerMovimientos({ tipo: "ahorro" })}>Ver todos <IconoAvanzar /></button>
           )}
         </div>
 

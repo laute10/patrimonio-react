@@ -95,6 +95,10 @@ function AppInterna({ tema, onCambiarTema }) {
       case "inicio":
         return (
           <Inicio
+            categoriasGasto={patrimonio.categoriasGasto}
+            agregarCategoria={patrimonio.agregarCategoria}
+            categoriasIngreso={patrimonio.categoriasIngreso}
+            agregarCategoriaIngreso={patrimonio.agregarCategoriaIngreso}
             patrimonioTotal={patrimonio.patrimonioTotal}
             disponible={patrimonio.disponible}
             ahorrosTotal={patrimonio.ahorrosTotal}
@@ -108,6 +112,10 @@ function AppInterna({ tema, onCambiarTema }) {
       case "movimientos":
         return (
           <Movimientos
+            categoriasGasto={patrimonio.categoriasGasto}
+            agregarCategoria={patrimonio.agregarCategoria}
+            categoriasIngreso={patrimonio.categoriasIngreso}
+            agregarCategoriaIngreso={patrimonio.agregarCategoriaIngreso}
             movimientos={patrimonio.movimientos}
             objetivos={patrimonio.objetivos}
             tarjetas={patrimonio.tarjetas}
@@ -139,6 +147,10 @@ function AppInterna({ tema, onCambiarTema }) {
       case "tarjetas":
         return (
           <Tarjetas
+            categoriasGasto={patrimonio.categoriasGasto}
+            agregarCategoria={patrimonio.agregarCategoria}
+            categoriasIngreso={patrimonio.categoriasIngreso}
+            agregarCategoriaIngreso={patrimonio.agregarCategoriaIngreso}
             tarjetas={patrimonio.tarjetas}
             crearTarjeta={patrimonio.crearTarjeta}
             agregarConsumoTarjeta={patrimonio.agregarConsumoTarjeta}

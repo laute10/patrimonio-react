@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Overlay from "../components/Overlay";
 import PanelLateral from "../components/PanelLateral";
+import SelectorCategoria from "../components/SelectorCategoria";
 import CampoFormulario from "../components/CampoFormulario";
 import { deudaPeriodo, etiquetaPeriodo, etiquetaCorta } from "../hooks/usePatrimonio";
 
@@ -20,7 +21,6 @@ import { deudaPeriodo, etiquetaPeriodo, etiquetaCorta } from "../hooks/usePatrim
 // Los datos financieros vienen siempre por props desde usePatrimonio.
 // ==========================================================================
 
-const CATEGORIAS_CONSUMO = ["Supermercado", "Transporte", "Facultad", "Ocio"];
 
 function formatearMonto(numero) {
   return "$ " + numero.toLocaleString("es-AR");
@@ -36,6 +36,8 @@ function valorOrden(periodo) {
 }
 
 function Tarjetas({
+  categoriasGasto,
+  agregarCategoria,
   tarjetas,
   crearTarjeta,
   agregarConsumoTarjeta,
@@ -59,7 +61,7 @@ function Tarjetas({
 
   // Formulario de consumo (sirve para agregar y para editar)
   const [consumoEditando, setConsumoEditando] = useState(null); // null = agregando
-  const [categoriaConsumo, setCategoriaConsumo] = useState(CATEGORIAS_CONSUMO[0]);
+  const [categoriaConsumo, setCategoriaConsumo] = useState(categoriasGasto[0]);
   const [montoConsumo, setMontoConsumo] = useState("");
   const [descripcionConsumo, setDescripcionConsumo] = useState("");
   const [errorConsumo, setErrorConsumo] = useState("");
@@ -121,7 +123,7 @@ function Tarjetas({
 
   function abrirPanelAgregarConsumo() {
     setConsumoEditando(null);
-    setCategoriaConsumo(CATEGORIAS_CONSUMO[0]);
+    setCategoriaConsumo(categoriasGasto[0]);
     setMontoConsumo("");
     setDescripcionConsumo("");
     setErrorConsumo("");
@@ -473,12 +475,12 @@ function Tarjetas({
         }
       >
         <form id="form-consumo" onSubmit={manejarGuardarConsumo} noValidate>
-          <CampoFormulario
+          <SelectorCategoria
             id="consumo-categoria"
-            etiqueta="Categoría"
-            opciones={CATEGORIAS_CONSUMO}
+            categorias={categoriasGasto}
             valor={categoriaConsumo}
             onCambio={setCategoriaConsumo}
+            onNueva={agregarCategoria}
           />
           <CampoFormulario
             id="consumo-monto"

@@ -1,3 +1,4 @@
+import { IconoCerrar } from "../components/Iconos";
 import { useState } from "react";
 import PanelMovimiento from "../components/PanelMovimiento";
 import { clasificar, formatearMonto, formatearTipo } from "../utils/formato";
@@ -33,6 +34,10 @@ function fechaDesdeCampo(texto, finDeDia) {
 }
 
 function Movimientos({
+  categoriasGasto,
+  agregarCategoria,
+  categoriasIngreso,
+  agregarCategoriaIngreso,
   movimientos,
   objetivos,
   tarjetas,
@@ -208,12 +213,12 @@ function Movimientos({
           <div className="filtros-activos">
             {objetivoFiltrado && (
               <button type="button" className="filtro-chip" onClick={() => setObjetivoId("todos")}>
-                Objetivo: {objetivoFiltrado.nombre} ✕
+                Objetivo: {objetivoFiltrado.nombre} <IconoCerrar tamano={14} />
               </button>
             )}
             {(desde !== "" || hasta !== "") && (
               <button type="button" className="filtro-chip" onClick={() => { setDesde(""); setHasta(""); }}>
-                Fechas: {desde || "…"} a {hasta || "…"} ✕
+                Fechas: {desde || "…"} a {hasta || "…"} <IconoCerrar tamano={14} />
               </button>
             )}
           </div>
@@ -265,6 +270,10 @@ function Movimientos({
 
       {movimientoSeleccionado && (
         <PanelMovimiento
+          categoriasGasto={categoriasGasto}
+          agregarCategoria={agregarCategoria}
+          categoriasIngreso={categoriasIngreso}
+          agregarCategoriaIngreso={agregarCategoriaIngreso}
           key={movimientoSeleccionado.id}
           movimiento={movimientoSeleccionado}
           disponible={disponible}

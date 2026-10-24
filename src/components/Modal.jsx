@@ -1,4 +1,5 @@
 import Overlay from "./Overlay";
+import { IconoCerrar } from "./Iconos";
 
 // ==========================================================================
 // Modal - ventana centrada sobre un fondo oscuro (distinta del panel
@@ -25,7 +26,7 @@ function Modal({ titulo, descripcion, onCerrar, conCerrar = false, ancho, childr
             <h2 className="modal__titulo">{titulo}</h2>
             {conCerrar && (
               <button type="button" className="panel__cerrar" onClick={onCerrar} aria-label="Cerrar">
-                X
+                <IconoCerrar />
               </button>
             )}
           </div>

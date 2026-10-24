@@ -1,3 +1,4 @@
+import { IconoCerrar, IconoMenu } from "./Iconos";
 import { useState } from "react";
 
 // ==========================================================================
@@ -49,7 +50,7 @@ function Header({ paginaActual, onNavegar, onAbrirAyuda }) {
           aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
           onClick={() => setMenuAbierto(!menuAbierto)}
         >
-          {menuAbierto ? "✕" : "☰"}
+          {menuAbierto ? <IconoCerrar tamano={24} /> : <IconoMenu />}
         </button>
 
         <nav className={menuAbierto ? "nav nav--abierto" : "nav"} id="menu-principal" aria-label="Principal">

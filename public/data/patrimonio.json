@@ -1,0 +1,218 @@
+{
+  "disponible": 650000,
+  "objetivos": [
+    {
+      "id": 1,
+      "nombre": "Departamento",
+      "montoObjetivo": 2000000,
+      "montoActual": 450000
+    },
+    {
+      "id": 2,
+      "nombre": "Auto",
+      "montoObjetivo": 1500000,
+      "montoActual": 300000
+    },
+    {
+      "id": 3,
+      "nombre": "Vacaciones",
+      "montoObjetivo": 1000000,
+      "montoActual": 100000
+    }
+  ],
+  "tarjetas": [
+    {
+      "id": 1,
+      "nombre": "Visa",
+      "periodos": [
+        {
+          "id": 101,
+          "mes": 7,
+          "anio": 2026,
+          "estado": "PAGADA",
+          "consumos": [
+            {
+              "id": 1,
+              "categoria": "Facultad",
+              "descripcion": "Cuotas",
+              "monto": 280000
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "mes": 8,
+          "anio": 2026,
+          "estado": "ABIERTA",
+          "consumos": [
+            {
+              "id": 2,
+              "categoria": "Facultad",
+              "descripcion": "Libros",
+              "monto": 50000
+            },
+            {
+              "id": 3,
+              "categoria": "Facultad",
+              "descripcion": "Cuota",
+              "monto": 150000
+            },
+            {
+              "id": 4,
+              "categoria": "Ocio",
+              "descripcion": "Ropa",
+              "monto": 50000
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "movimientos": [
+    {
+      "id": 1,
+      "tipo": "ingreso",
+      "categoria": "Sueldo",
+      "descripcion": "",
+      "monto": 700000,
+      "signo": "+",
+      "diasAtras": 0
+    },
+    {
+      "id": 2,
+      "tipo": "gasto",
+      "categoria": "Supermercado",
+      "descripcion": "",
+      "monto": 45500,
+      "signo": "-",
+      "diasAtras": 0
+    },
+    {
+      "id": 3,
+      "tipo": "tarjeta-consumo",
+      "categoria": "Visa",
+      "descripcion": "Libros",
+      "monto": 50000,
+      "signo": null,
+      "consumoId": 2,
+      "diasAtras": 1
+    },
+    {
+      "id": 4,
+      "tipo": "ahorro-agregado",
+      "categoria": "Departamento",
+      "descripcion": "",
+      "monto": 50000,
+      "signo": null,
+      "diasAtras": 1
+    },
+    {
+      "id": 5,
+      "tipo": "gasto",
+      "categoria": "Transporte",
+      "descripcion": "Carga SUBE",
+      "monto": 12000,
+      "signo": "-",
+      "diasAtras": 3
+    },
+    {
+      "id": 6,
+      "tipo": "gasto",
+      "categoria": "Ocio",
+      "descripcion": "Cine",
+      "monto": 18000,
+      "signo": "-",
+      "diasAtras": 5
+    },
+    {
+      "id": 7,
+      "tipo": "gasto",
+      "categoria": "Supermercado",
+      "descripcion": "Compra semanal",
+      "monto": 62000,
+      "signo": "-",
+      "diasAtras": 9
+    },
+    {
+      "id": 8,
+      "tipo": "ingreso",
+      "categoria": "Freelance",
+      "descripcion": "Diseño de logo",
+      "monto": 120000,
+      "signo": "+",
+      "diasAtras": 14
+    },
+    {
+      "id": 9,
+      "tipo": "gasto",
+      "categoria": "Facultad",
+      "descripcion": "Fotocopias",
+      "monto": 9000,
+      "signo": "-",
+      "diasAtras": 20
+    },
+    {
+      "id": 10,
+      "tipo": "ingreso",
+      "categoria": "Sueldo",
+      "descripcion": "",
+      "monto": 680000,
+      "signo": "+",
+      "diasAtras": 33
+    },
+    {
+      "id": 11,
+      "tipo": "gasto",
+      "categoria": "Supermercado",
+      "descripcion": "",
+      "monto": 71000,
+      "signo": "-",
+      "diasAtras": 36
+    },
+    {
+      "id": 12,
+      "tipo": "gasto",
+      "categoria": "Transporte",
+      "descripcion": "",
+      "monto": 15000,
+      "signo": "-",
+      "diasAtras": 40
+    },
+    {
+      "id": 13,
+      "tipo": "tarjeta-pago",
+      "categoria": "Pago Visa - Agosto 2026",
+      "descripcion": "",
+      "monto": 280000,
+      "signo": "-",
+      "diasAtras": 45
+    },
+    {
+      "id": 14,
+      "tipo": "ingreso",
+      "categoria": "Sueldo",
+      "descripcion": "",
+      "monto": 650000,
+      "signo": "+",
+      "diasAtras": 63
+    },
+    {
+      "id": 15,
+      "tipo": "gasto",
+      "categoria": "Ocio",
+      "descripcion": "Salida con amigos",
+      "monto": 30000,
+      "signo": "-",
+      "diasAtras": 66
+    },
+    {
+      "id": 16,
+      "tipo": "gasto",
+      "categoria": "Facultad",
+      "descripcion": "Matrícula",
+      "monto": 90000,
+      "signo": "-",
+      "diasAtras": 70
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 1668 904" width="1668" height="904" role="img" aria-label="Árbol de componentes de Patrimonio: App contiene la estructura común, las pantallas de acceso y las pantallas con sesión; Modal, PanelLateral, Overlay y CampoFormulario se reutilizan en varias pantallas; PanelObjetivo y PanelMovimiento son los paneles de detalle de Ahorros y Movimientos." font-family="Inter, Arial, sans-serif">
+<rect x="0" y="0" width="210" height="900" rx="16" fill="#1E293B"/>
+<text x="105" y="420.0" text-anchor="middle" font-size="36" font-weight="700" fill="#F8FAFC">App</text>
+<text x="105" y="458.0" text-anchor="middle" font-size="24" fill="#93C5FD">usuario</text>
+<text x="105" y="490.0" text-anchor="middle" font-size="24" fill="#93C5FD">paginaActual</text>
+<text x="105" y="522.0" text-anchor="middle" font-size="24" fill="#93C5FD">parametros</text>
+<text x="105" y="554.0" text-anchor="middle" font-size="24" fill="#93C5FD">usePatrimonio</text>
+<path d="M210 450.0 H235" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 26 V874" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 26 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 106 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 186 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 330 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 554 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 634 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 794 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M235 874 H260" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<path d="M570 26 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="0" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="34" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Estructura común</text>
+<rect x="606" y="0" width="127" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="669.5" y="34" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Header</text>
+<rect x="745" y="0" width="127" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="808.5" y="34" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Footer</text>
+<rect x="884" y="0" width="193" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="980.5" y="34" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">EstadoCarga</text>
+<path d="M570 106 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="80" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="114" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Pantallas de acceso</text>
+<rect x="606" y="80" width="180" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="696.0" y="114" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">AuthLayout</text>
+<rect x="798" y="80" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="921.0" y="114" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">CampoFormulario</text>
+<rect x="1056" y="80" width="193" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1152.5" y="114" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">EnlaceTexto</text>
+<path d="M570 186 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="160" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="194" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Inicio</text>
+<rect x="606" y="160" width="193" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="702.5" y="194" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">TarjetaMini</text>
+<rect x="811" y="160" width="232" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="927.0" y="194" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">MovimientoItem</text>
+<rect x="1055" y="160" width="312" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1211.0" y="194" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">FormularioMovimiento</text>
+<rect x="1379" y="160" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1502.0" y="194" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">CampoFormulario</text>
+<rect x="606" y="224" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="709.0" y="258" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelLateral</text>
+<rect x="824" y="224" width="140" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="894.0" y="258" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Overlay</text>
+<path d="M570 330 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="304" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="338" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Ahorros</text>
+<rect x="606" y="304" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="729.0" y="338" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">TarjetaObjetivo</text>
+<rect x="864" y="304" width="219" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="973.5" y="338" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelObjetivo</text>
+<rect x="1095" y="304" width="114" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1152.0" y="338" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Modal</text>
+<rect x="1221" y="304" width="219" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1330.5" y="338" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">SelectorIcono</text>
+<rect x="606" y="368" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="729.0" y="402" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">CampoFormulario</text>
+<rect x="864" y="368" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="967.0" y="402" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelLateral</text>
+<rect x="1082" y="368" width="140" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1152.0" y="402" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Overlay</text>
+<path d="M570 474 H646" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="300" y="448" width="270" height="52" rx="12" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="435.0" y="482" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">PanelObjetivo</text>
+<rect x="646" y="448" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="749.0" y="482" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelLateral</text>
+<rect x="864" y="448" width="114" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="921.0" y="482" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Modal</text>
+<rect x="990" y="448" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1113.0" y="482" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">CampoFormulario</text>
+<rect x="1248" y="448" width="219" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1357.5" y="482" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">SelectorIcono</text>
+<rect x="1479" y="448" width="140" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1549.0" y="482" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Overlay</text>
+<path d="M570 554 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="528" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="562" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Tarjetas</text>
+<rect x="606" y="528" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="729.0" y="562" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">CampoFormulario</text>
+<rect x="864" y="528" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="967.0" y="562" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelLateral</text>
+<rect x="1082" y="528" width="140" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1152.0" y="562" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Overlay</text>
+<path d="M570 634 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="608" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="642" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Movimientos</text>
+<rect x="606" y="608" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="729.0" y="642" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelMovimiento</text>
+<rect x="864" y="608" width="246" height="52" rx="26" fill="#F1F5F9" stroke="#94A3B8" stroke-width="2"/>
+<text x="987.0" y="642" text-anchor="middle" font-size="24" font-weight="500" fill="#334155">lista con map()</text>
+<path d="M570 714 H646" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="300" y="688" width="270" height="52" rx="12" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="435.0" y="722" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">PanelMovimiento</text>
+<rect x="646" y="688" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="749.0" y="722" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelLateral</text>
+<rect x="864" y="688" width="114" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="921.0" y="722" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Modal</text>
+<rect x="990" y="688" width="312" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1146.0" y="722" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">FormularioMovimiento</text>
+<rect x="1314" y="688" width="140" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1384.0" y="722" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Overlay</text>
+<path d="M570 794 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="768" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="802" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Estadísticas</text>
+<rect x="606" y="768" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="709.0" y="802" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelGrafico</text>
+<path d="M570 874 H606" stroke="#94A3B8" stroke-width="3" fill="none"/>
+<rect x="260" y="848" width="310" height="52" rx="12" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+<text x="415.0" y="882" text-anchor="middle" font-size="24" font-weight="600" fill="#1E293B">Configuración</text>
+<rect x="606" y="848" width="246" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="729.0" y="882" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">CampoFormulario</text>
+<rect x="864" y="848" width="206" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="967.0" y="882" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">PanelLateral</text>
+<rect x="1082" y="848" width="140" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="1152.0" y="882" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Overlay</text>
+</svg>

@@ -51,3 +51,10 @@ Ver `arbol-de-componentes.svg`. `App` decide qué se ve según dos estados (`usu
 - Crear objetivo es un `Modal` centrado; el detalle, editar y los movimientos de dinero son paneles laterales.
 - Movimientos tiene filtros aplicados (tipo, objetivo, fechas) y un borrador en la tarjeta de filtros que se aplica con el botón.
 - Reglas: no se elimina un objetivo con dinero; los movimientos de ahorros y tarjetas se gestionan desde su pantalla; editar o eliminar un ingreso/gasto no puede dejar el disponible en negativo.
+
+
+## Modo oscuro
+
+- `App` guarda el estado `tema` ("claro" | "oscuro"), lo recuerda en `localStorage` (dentro de try/catch) y envuelve la aplicación en `<div className="app tema-oscuro">`.
+- Todos los colores salen de variables CSS en `:root`; la clase `.tema-oscuro` solo redefine esas variables (misma familia slate, textos de acento más claros para mantener contraste AA).
+- El selector está en Configuración › Preferencias › Apariencia. Verificado con axe-core en ambos temas (0 violaciones).

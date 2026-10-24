@@ -27,7 +27,7 @@ import { nombreDesdeCorreo } from "./utils/validacion";
 // La autenticación es simulada hasta que exista el backend.
 // ==========================================================================
 
-function App() {
+function AppInterna({ tema, onCambiarTema }) {
   const [usuario, setUsuario] = useState(null);
   const [pantallaAcceso, setPantallaAcceso] = useState("login");
   const [paginaActual, setPaginaActual] = useState("inicio");
@@ -160,7 +160,7 @@ function App() {
           />
         );
       case "configuracion":
-        return <Configuracion usuario={usuario} onGuardar={guardarDatos} onCerrarSesion={cerrarSesion} />;
+        return <Configuracion tema={tema} onCambiarTema={onCambiarTema} usuario={usuario} onGuardar={guardarDatos} onCerrarSesion={cerrarSesion} />;
       default:
         return null;
     }
@@ -173,6 +173,34 @@ function App() {
       <Footer />
       <PanelAyuda abierto={ayudaAbierta} onCerrar={() => setAyudaAbierta(false)} />
     </>
+  );
+}
+
+// App guarda el tema ("claro" u "oscuro") y envuelve todo en un div con la
+// clase correspondiente: el CSS cambia los colores sin tocar el DOM a mano.
+// La elección se recuerda en localStorage (puede fallar en navegación privada).
+function App() {
+  const [tema, setTema] = useState(() => {
+    try {
+      return localStorage.getItem("tema") === "oscuro" ? "oscuro" : "claro";
+    } catch {
+      return "claro";
+    }
+  });
+
+  function cambiarTema(nuevo) {
+    setTema(nuevo);
+    try {
+      localStorage.setItem("tema", nuevo);
+    } catch {
+      // Sin almacenamiento: el tema vale solo para esta visita.
+    }
+  }
+
+  return (
+    <div className={tema === "oscuro" ? "app tema-oscuro" : "app"}>
+      <AppInterna tema={tema} onCambiarTema={cambiarTema} />
+    </div>
   );
 }
 

@@ -27,6 +27,21 @@
   --color-ahorro-texto: #4f46e5;
   --color-tarjeta-texto: #b45309;
 
+  /* Fondos suaves y estados (tienen su versión oscura más abajo) */
+  --color-texto-inverso: #ffffff;
+  --color-primario-hover: #1d4ed8;
+  --color-fondo-ingreso: #dcfce7;
+  --color-fondo-gasto: #fee2e2;
+  --color-fondo-gasto-suave: #fef2f2;
+  --color-fondo-ahorro: #e0e7ff;
+  --color-fondo-tarjeta: #fef3c7;
+  --color-fondo-exito: #f0fdf4;
+  --color-texto-exito: #166534;
+  --color-destructivo-solido: #dc2626;
+  --color-destructivo-solido-hover: #b91c1c;
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-sombra: rgba(15, 23, 42, 0.12);
+
   /* Colores semánticos por tipo de movimiento */
   --color-ingreso: #22c55e;
   --color-gasto: #ef4444;
@@ -133,11 +148,11 @@ button {
 }
 
 .nav__link:hover {
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
 }
 
 .nav__link--activo {
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
 }
 
 /* ==========================================================================
@@ -217,7 +232,7 @@ button {
   font-weight: 600;
 }
 
-.monto--disponible { color: var(--color-primario); }
+.monto--disponible { color: var(--color-primario-texto); }
 .monto--ahorros { color: var(--color-ahorro-texto); }
 .monto--tarjeta { color: var(--color-tarjeta-texto); }
 
@@ -253,11 +268,11 @@ button {
 
 .btn--primario {
   background-color: var(--color-primario);
-  color: var(--color-superficie);
+  color: var(--color-texto-inverso);
 }
 
 .btn--primario:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primario-hover);
 }
 
 .btn--secundario {
@@ -288,7 +303,7 @@ button {
 
 .movimientos__header .link {
   font-size: var(--texto-sm);
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
 }
 
 .movimientos__header .link:hover {
@@ -384,7 +399,7 @@ button {
 .overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: var(--color-overlay);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
@@ -476,7 +491,7 @@ button {
 .resumen-panel__nombre {
   font-size: 16px;
   font-weight: 600;
-  color: #334155;
+  color: var(--color-texto-terciario);
 }
 
 .resumen-panel__periodo {
@@ -629,7 +644,7 @@ button.consumo-fila:hover {
 }
 
 .tarjeta-auth__titulo {
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
   font-size: 24px;
   font-weight: 600;
   text-align: center;
@@ -647,7 +662,7 @@ button.consumo-fila:hover {
   display: block;
   text-align: right;
   font-size: var(--texto-xs);
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
   margin-top: calc(var(--espacio-2) * -1);
   margin-bottom: var(--espacio-5);
 }
@@ -664,7 +679,7 @@ button.consumo-fila:hover {
 }
 
 .auth-pie a {
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
   font-weight: 500;
 }
 
@@ -673,9 +688,9 @@ button.consumo-fila:hover {
 }
 
 .mensaje-error {
-  background-color: #fef2f2;
+  background-color: var(--color-fondo-gasto-suave);
   border: 1px solid var(--color-destructivo);
-  color: var(--color-destructivo);
+  color: var(--color-gasto-texto);
   font-size: var(--texto-xs);
   padding: var(--espacio-3);
   border-radius: var(--radio-borde);
@@ -683,9 +698,9 @@ button.consumo-fila:hover {
 }
 
 .mensaje-exito {
-  background-color: #f0fdf4;
+  background-color: var(--color-fondo-exito);
   border: 1px solid var(--color-ingreso);
-  color: #166534;
+  color: var(--color-texto-exito);
   font-size: var(--texto-xs);
   padding: var(--espacio-3);
   border-radius: var(--radio-borde);
@@ -767,7 +782,7 @@ button.consumo-fila:hover {
 .filtro-tab--activo {
   background-color: var(--color-primario);
   border-color: var(--color-primario);
-  color: var(--color-superficie);
+  color: var(--color-texto-inverso);
 }
 
 .grupo-fecha {
@@ -824,10 +839,10 @@ button.consumo-fila:hover {
   flex-shrink: 0;
 }
 
-.item-movimiento__icono--ingreso { background-color: #dcfce7; color: var(--color-ingreso-texto); }
-.item-movimiento__icono--gasto { background-color: #fee2e2; color: var(--color-gasto-texto); }
-.item-movimiento__icono--ahorro { background-color: #e0e7ff; color: var(--color-ahorro-texto); }
-.item-movimiento__icono--tarjeta { background-color: #fef3c7; color: var(--color-tarjeta-texto); }
+.item-movimiento__icono--ingreso { background-color: var(--color-fondo-ingreso); color: var(--color-ingreso-texto); }
+.item-movimiento__icono--gasto { background-color: var(--color-fondo-gasto); color: var(--color-gasto-texto); }
+.item-movimiento__icono--ahorro { background-color: var(--color-fondo-ahorro); color: var(--color-ahorro-texto); }
+.item-movimiento__icono--tarjeta { background-color: var(--color-fondo-tarjeta); color: var(--color-tarjeta-texto); }
 
 .item-movimiento__info {
   flex: 1;
@@ -874,7 +889,7 @@ button.consumo-fila:hover {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: #fef3c7;
+  background-color: var(--color-fondo-tarjeta);
   color: var(--color-tarjeta);
   display: flex;
   align-items: center;
@@ -967,7 +982,7 @@ button.consumo-fila:hover {
 
 .seccion-header .link {
   font-size: var(--texto-sm);
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
 }
 
 .seccion-header .link:hover {
@@ -1000,7 +1015,7 @@ button.consumo-fila:hover {
   height: 36px;
   border-radius: 50%;
   background-color: var(--color-primario-claro);
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1047,7 +1062,7 @@ button.consumo-fila:hover {
 .objetivo-card__porcentaje {
   font-size: var(--texto-xs);
   font-weight: 500;
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
 }
 
 .lista-recientes {
@@ -1081,13 +1096,13 @@ button.consumo-fila:hover {
 }
 
 .recientes-item__icono--positivo {
-  background-color: #dcfce7;
-  color: #16a34a;
+  background-color: var(--color-fondo-ingreso);
+  color: var(--color-ingreso-texto);
 }
 
 .recientes-item__icono--negativo {
-  background-color: #fee2e2;
-  color: #dc2626;
+  background-color: var(--color-fondo-gasto);
+  color: var(--color-gasto-texto);
 }
 
 .recientes-item__info {
@@ -1160,8 +1175,8 @@ button.consumo-fila:hover {
 }
 
 .badge--abierta { background-color: var(--color-primario-claro); color: var(--color-primario-texto); }
-.badge--pagada { background-color: #dcfce7; color: var(--color-ingreso-texto); }
-.badge--cerrada { background-color: #fef3c7; color: var(--color-tarjeta-texto); }
+.badge--pagada { background-color: var(--color-fondo-ingreso); color: var(--color-ingreso-texto); }
+.badge--cerrada { background-color: var(--color-fondo-tarjeta); color: var(--color-tarjeta-texto); }
 
 .tarjeta-principal__deuda .etiqueta {
   display: block;
@@ -1640,17 +1655,17 @@ button.consumo-fila:hover {
 }
 
 .btn--destructivo:hover {
-  background-color: #fef2f2;
+  background-color: var(--color-fondo-gasto-suave);
 }
 
 /* En el modal, la acción que confirma va rellena (acción irreversible). */
 .modal__acciones .btn--destructivo {
-  background-color: var(--color-gasto-texto);
-  color: var(--color-superficie);
+  background-color: var(--color-destructivo-solido);
+  color: var(--color-texto-inverso);
 }
 
 .modal__acciones .btn--destructivo:hover {
-  background-color: #b91c1c;
+  background-color: var(--color-destructivo-solido-hover);
 }
 
 /* ==========================================================================
@@ -1695,7 +1710,7 @@ button.consumo-fila:hover {
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde);
   font-size: var(--texto-sm);
-  color: #334155;
+  color: var(--color-texto-terciario);
 }
 
 .modal__acciones {
@@ -1786,7 +1801,7 @@ button.consumo-fila:hover {
 .resumen-tarjeta__nombre {
   font-size: 16px;
   font-weight: 600;
-  color: #334155;
+  color: var(--color-texto-terciario);
 }
 
 .resumen-tarjeta__estado {
@@ -1856,7 +1871,7 @@ button.consumo-fila:hover {
   border: none;
   padding: 0;
   font: inherit;
-  color: var(--color-primario);
+  color: var(--color-primario-texto);
   font-weight: 500;
   cursor: pointer;
   text-transform: uppercase;
@@ -1902,7 +1917,7 @@ input:focus-visible,
   top: -100px;
   left: var(--espacio-4);
   background-color: var(--color-primario);
-  color: var(--color-superficie);
+  color: var(--color-texto-inverso);
   padding: var(--espacio-2) var(--espacio-4);
   border-radius: var(--radio-borde);
   z-index: 500;
@@ -2007,8 +2022,8 @@ input:focus-visible,
   margin: 0 0 12px;
   padding: 10px 14px;
   border-radius: 8px;
-  background: #dcfce7;
-  color: #166534;
+  background: var(--color-fondo-ingreso);
+  color: var(--color-texto-exito);
   font-size: 14px;
   font-weight: 500;
 }
@@ -2268,7 +2283,7 @@ input:focus-visible,
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 12px var(--color-sombra);
   display: flex;
   flex-direction: column;
   z-index: 5;
@@ -2537,4 +2552,67 @@ input:focus-visible,
   font-size: 13px;
   line-height: 1.5;
   color: var(--color-texto-boton-secundario);
+}
+
+
+/* ==========================================================================
+   MODO OSCURO
+   Se activa con la clase "tema-oscuro" en el contenedor de App (el estado
+   "tema" vive en App). Solo redefine las variables de color: ningún
+   componente tiene colores propios para el modo oscuro.
+   Paleta: la misma familia de grises azulados (slate) del modo claro, de la
+   escala 900 a la 100; los colores de marca se mantienen y los de texto se
+   aclaran para conservar el contraste AA sobre fondos oscuros.
+   ========================================================================== */
+
+.tema-oscuro {
+  --color-fondo: #0f172a;
+  --color-superficie: #1e293b;
+  --color-borde: #334155;
+  --color-borde-input: #475569;
+  --color-texto-primario: #f1f5f9;
+  --color-texto-secundario: #94a3b8;
+  --color-texto-terciario: #cbd5e1;
+  --color-texto-boton-secundario: #cbd5e1;
+  --color-placeholder: #94a3b8;
+  --color-primario-claro: #1e3a5f;
+  --color-primario-texto: #93c5fd;
+  --color-ingreso-texto: #4ade80;
+  --color-gasto-texto: #f87171;
+  --color-ahorro-texto: #a5b4fc;
+  --color-tarjeta-texto: #fbbf24;
+  --color-fondo-ingreso: #123524;
+  --color-fondo-gasto: #3b1c22;
+  --color-fondo-gasto-suave: #2a1a1f;
+  --color-fondo-ahorro: #272a5c;
+  --color-fondo-tarjeta: #3b2e12;
+  --color-fondo-exito: #0f2e1c;
+  --color-texto-exito: #86efac;
+  --color-overlay: rgba(0, 0, 0, 0.65);
+  --color-sombra: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+.app {
+  min-height: 100vh;
+  background-color: var(--color-fondo);
+  color: var(--color-texto-primario);
+}
+
+/* :where() deja estas reglas sin peso: solo rellenan lo que ninguna otra
+   regla pintó (botones, campos y listas desplegables nativas). */
+:where(.tema-oscuro) button {
+  color: var(--color-texto-primario);
+}
+
+:where(.tema-oscuro) :is(input, select, textarea) {
+  color: var(--color-texto-primario);
+  background-color: var(--color-superficie);
+}
+
+/* Selector de tema (Configuración) */
+.selector-tema {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
 }

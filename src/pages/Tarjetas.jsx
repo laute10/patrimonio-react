@@ -565,7 +565,7 @@ function Tarjetas({
               <button
                 type="button"
                 className="btn"
-                style={{ backgroundColor: "#dc2626", color: "var(--color-superficie)", border: "none" }}
+                style={{ backgroundColor: "var(--color-destructivo-solido)", color: "var(--color-texto-inverso)", border: "none" }}
                 onClick={confirmarEliminarConsumo}
               >
                 Eliminar

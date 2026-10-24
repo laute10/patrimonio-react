@@ -122,6 +122,11 @@ const SECCIONES = [
         respuesta: "Desde Configuración podés editar tu nombre y correo, y cerrar sesión.",
       },
       {
+        pregunta: "¿Cómo activo el modo oscuro?",
+        respuesta:
+          "En Configuración › Preferencias › Apariencia elegí Oscuro. La aplicación recuerda tu elección en este navegador.",
+      },
+      {
         pregunta: "¿Por qué mis datos desaparecen al recargar la página?",
         respuesta:
           "Esta versión todavía no guarda la información en un servidor, así que al recargar vuelven los datos de ejemplo.",

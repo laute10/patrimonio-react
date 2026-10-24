@@ -11,7 +11,7 @@ import { validarNombre, validarCorreo } from "../utils/validacion";
 // formulario "Editar datos", que no se guarda hasta apretar el botón.
 // ==========================================================================
 
-function Configuracion({ usuario, onGuardar, onCerrarSesion }) {
+function Configuracion({ tema, onCambiarTema, usuario, onGuardar, onCerrarSesion }) {
   // abierto: null | "editar" | "cerrar-sesion"  (uno solo a la vez)
   const [abierto, setAbierto] = useState(null);
   const [nombre, setNombre] = useState(usuario.nombre);
@@ -85,6 +85,28 @@ function Configuracion({ usuario, onGuardar, onCerrarSesion }) {
             <div className="config-dato">
               <span className="etiqueta">Moneda:</span> <span className="valor">Pesos argentinos (ARS)</span>
               <p className="descripcion">Moneda utilizada para mostrar tus valores y movimientos</p>
+            </div>
+            <div className="config-dato">
+              <span className="etiqueta" id="etiqueta-tema">Apariencia:</span>
+              <p className="descripcion">Elegí cómo querés ver la aplicación</p>
+              <div className="selector-tema" role="group" aria-labelledby="etiqueta-tema">
+                <button
+                  type="button"
+                  className={tema === "claro" ? "btn btn--primario" : "btn btn--secundario"}
+                  aria-pressed={tema === "claro"}
+                  onClick={() => onCambiarTema("claro")}
+                >
+                  Claro
+                </button>
+                <button
+                  type="button"
+                  className={tema === "oscuro" ? "btn btn--primario" : "btn btn--secundario"}
+                  aria-pressed={tema === "oscuro"}
+                  onClick={() => onCambiarTema("oscuro")}
+                >
+                  Oscuro
+                </button>
+              </div>
             </div>
           </div>
         </section>

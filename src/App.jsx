@@ -11,6 +11,7 @@ import CrearCuenta from "./pages/CrearCuenta";
 import Recuperar from "./pages/Recuperar";
 import Footer from "./components/Footer";
 import EstadoCarga from "./components/EstadoCarga";
+import PanelAyuda from "./components/PanelAyuda";
 import usePatrimonio from "./hooks/usePatrimonio";
 import { nombreDesdeCorreo } from "./utils/validacion";
 
@@ -33,6 +34,8 @@ function App() {
   // Datos que una pantalla le pasa a otra al navegar (por ejemplo, el
   // filtro con el que se abre Movimientos). Se leen al montar la pantalla.
   const [parametros, setParametros] = useState({});
+  // El panel de Ayuda se puede abrir desde cualquier pantalla.
+  const [ayudaAbierta, setAyudaAbierta] = useState(false);
 
   function navegar(pagina, nuevosParametros = {}) {
     setParametros(nuevosParametros);
@@ -80,8 +83,9 @@ function App() {
   if (patrimonio.cargando || patrimonio.error !== "") {
     return (
       <>
-        <Header paginaActual={paginaActual} onNavegar={(pagina) => navegar(pagina)} />
+        <Header paginaActual={paginaActual} onNavegar={(pagina) => navegar(pagina)} onAbrirAyuda={() => setAyudaAbierta(true)} />
         <EstadoCarga error={patrimonio.error} onReintentar={patrimonio.recargar} />
+        <PanelAyuda abierto={ayudaAbierta} onCerrar={() => setAyudaAbierta(false)} />
       </>
     );
   }
@@ -164,9 +168,10 @@ function App() {
 
   return (
     <>
-      <Header paginaActual={paginaActual} onNavegar={(pagina) => navegar(pagina)} />
+      <Header paginaActual={paginaActual} onNavegar={(pagina) => navegar(pagina)} onAbrirAyuda={() => setAyudaAbierta(true)} />
       {renderizarPagina()}
       <Footer />
+      <PanelAyuda abierto={ayudaAbierta} onCerrar={() => setAyudaAbierta(false)} />
     </>
   );
 }

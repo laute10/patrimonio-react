@@ -17,7 +17,7 @@ const ENLACES = [
   { id: "configuracion", texto: "Configuración" },
 ];
 
-function Header({ paginaActual, onNavegar }) {
+function Header({ paginaActual, onNavegar, onAbrirAyuda }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   function elegirPagina(id) {
@@ -64,6 +64,16 @@ function Header({ paginaActual, onNavegar }) {
               {enlace.texto}
             </button>
           ))}
+          <button
+            type="button"
+            className="nav__link nav__link--ayuda"
+            onClick={() => {
+              setMenuAbierto(false);
+              onAbrirAyuda();
+            }}
+          >
+            Ayuda
+          </button>
         </nav>
       </div>
     </header>

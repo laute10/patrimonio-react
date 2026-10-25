@@ -2721,6 +2721,7 @@ input:focus-visible,
 
   .grafico-barras-dobles .barra-v-etiqueta {
     font-size: 10px;
+    line-height: 1.4; /* alto suficiente para que overflow no corte la g, j, p, y */
     max-width: 100%;
     overflow: hidden;
     text-overflow: clip;

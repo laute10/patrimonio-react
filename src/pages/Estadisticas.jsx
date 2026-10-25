@@ -15,6 +15,7 @@ const PERIODOS = [
   { id: "este-mes", texto: "Este mes" },
   { id: "mes-anterior", texto: "Mes anterior" },
   { id: "ultimos-3", texto: "Últimos 3 meses" },
+  { id: "ultimos-12", texto: "Últimos 12 meses" },
   { id: "este-anio", texto: "Este año" },
 ];
 
@@ -26,6 +27,7 @@ function rangoPeriodo(id, hoy) {
   if (id === "este-mes") return { desde: new Date(anio, mes, 1), hasta: new Date(anio, mes + 1, 1) };
   if (id === "mes-anterior") return { desde: new Date(anio, mes - 1, 1), hasta: new Date(anio, mes, 1) };
   if (id === "ultimos-3") return { desde: new Date(anio, mes - 2, 1), hasta: new Date(anio, mes + 1, 1) };
+  if (id === "ultimos-12") return { desde: new Date(anio, mes - 11, 1), hasta: new Date(anio, mes + 1, 1) };
   return { desde: new Date(anio, 0, 1), hasta: new Date(anio + 1, 0, 1) };
 }
 

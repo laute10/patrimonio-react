@@ -1442,7 +1442,8 @@ button.consumo-fila:hover {
 
 .grafico-leyenda {
   display: flex;
-  gap: var(--espacio-5);
+  flex-wrap: wrap; /* con varias entradas, baja de renglón en celular */
+  gap: var(--espacio-2) var(--espacio-5);
   margin-bottom: var(--espacio-4);
   font-size: var(--texto-xs);
   color: var(--color-texto-secundario);
@@ -2012,6 +2013,151 @@ input:focus-visible,
 .leyenda-punto--disponible { background-color: var(--color-primario); }
 .leyenda-punto--ahorros { background-color: var(--color-ahorro); }
 .leyenda-punto--tarjeta { background-color: var(--color-tarjeta); }
+
+/* Progreso del patrimonio (áreas apiladas) */
+
+.grafico-patrimonio__resumen {
+  font-size: var(--texto-sm);
+  line-height: 1.5;
+  color: var(--color-texto-secundario);
+  margin-bottom: var(--espacio-4);
+}
+
+.grafico-patrimonio__resumen strong {
+  font-weight: 600;
+  color: var(--color-texto-primario);
+}
+
+.grafico-patrimonio__diferencia {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.grafico-patrimonio__diferencia--sube { color: var(--color-ingreso-texto); }
+.grafico-patrimonio__diferencia--baja { color: var(--color-gasto-texto); }
+
+.leyenda-linea {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+  background-color: var(--color-texto-primario);
+}
+
+.grafico-patrimonio__lienzo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--espacio-2);
+}
+
+.grafico-patrimonio__eje-y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  font-size: var(--texto-xs);
+  line-height: 1;
+  color: var(--color-texto-secundario);
+  text-align: right;
+}
+
+.grafico-patrimonio__svg {
+  display: block;
+  width: 100%;
+  height: 200px;
+  overflow: visible;
+}
+
+.grafico-patrimonio__eje-x {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--espacio-2);
+  font-size: var(--texto-xs);
+  color: var(--color-texto-secundario);
+}
+
+.grafico-patrimonio__guia {
+  stroke: var(--color-borde);
+  stroke-width: 1;
+}
+
+/* El borde del color de la superficie separa una capa de la otra */
+.grafico-patrimonio__capa {
+  stroke: var(--color-superficie);
+  stroke-width: 1.5;
+}
+
+.grafico-patrimonio__capa--disponible { fill: var(--color-primario); }
+.grafico-patrimonio__capa--ahorros { fill: var(--color-ahorro); }
+.grafico-patrimonio__capa--tarjeta { fill: var(--color-tarjeta); }
+
+.grafico-patrimonio__total {
+  fill: none;
+  stroke: var(--color-texto-primario);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.grafico-patrimonio__datos {
+  margin-top: var(--espacio-5);
+  font-size: var(--texto-sm);
+}
+
+.grafico-patrimonio__datos summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--color-primario-texto);
+}
+
+.tabla-desplazable {
+  overflow-x: auto;
+  margin-top: var(--espacio-3);
+}
+
+.tabla-valores {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-primario);
+}
+
+.tabla-valores caption {
+  text-align: left;
+  margin-bottom: var(--espacio-2);
+  color: var(--color-texto-secundario);
+}
+
+.tabla-valores th,
+.tabla-valores td {
+  padding: 6px var(--espacio-2);
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla-valores thead th {
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+}
+
+.tabla-valores thead th:first-child,
+.tabla-valores tbody th {
+  text-align: left;
+}
+
+.tabla-valores tbody th {
+  font-weight: 500;
+}
+
+/* En pantallas anchas el gráfico gana alto para no quedar tan chato */
+@media (min-width: 900px) {
+  .grafico-patrimonio__eje-y,
+  .grafico-patrimonio__svg {
+    height: 260px;
+  }
+}
 
 /* ==========================================================================
    ERRORES DE VALIDACIÓN (junto a cada campo) Y AVISO DE ÉXITO

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import PanelGrafico from "../components/PanelGrafico";
+import GraficoPatrimonio from "../components/GraficoPatrimonio";
 import { formatearMonto } from "../utils/formato";
+import { historialPatrimonio } from "../utils/historialPatrimonio";
 
 // ==========================================================================
 // Estadísticas - gráficos calculados con los MISMOS movimientos que ven
@@ -48,6 +50,18 @@ function Estadisticas({ movimientos, objetivos, disponible, ahorrosTotal, reserv
 
   const ingresos = sumar(delPeriodo, "+");
   const gastos = sumar(delPeriodo, "-");
+
+  // Progreso del patrimonio: se reconstruye hacia atrás desde los valores
+  // de hoy (con TODOS los movimientos, no solo los del período).
+  const historial = historialPatrimonio({
+    disponible,
+    ahorros: ahorrosTotal,
+    reserva: reservaTarjeta,
+    movimientos,
+    desde,
+    hasta,
+    hoy,
+  });
 
   // Gastos por categoría (solo los gastos "comunes"), de mayor a menor.
   const porCategoria = [];
@@ -129,6 +143,12 @@ function Estadisticas({ movimientos, objetivos, disponible, ahorrosTotal, reserv
           </div>
         </div>
       </section>
+
+      {/* Fuera del aviso de "sin datos": aunque no haya movimientos en el
+          período, el patrimonio existe y una línea plana también informa. */}
+      <PanelGrafico titulo="Progreso del patrimonio">
+        <GraficoPatrimonio historial={historial} />
+      </PanelGrafico>
 
       {delPeriodo.length === 0 ? (
         <section className="estado-vacio">

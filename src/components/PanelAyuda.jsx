@@ -118,6 +118,11 @@ const SECCIONES = [
           "Con el selector de período de Estadísticas: todos los gráficos se actualizan juntos. Los movimientos entre tus propios ahorros no cuentan como ingresos ni gastos.",
       },
       {
+        pregunta: "¿Cómo se calcula el progreso del patrimonio?",
+        respuesta:
+          "La app no guarda un historial aparte: parte de tus valores de hoy y va hacia atrás deshaciendo cada movimiento, con las mismas reglas que usa al registrarlo. Así, el gráfico siempre coincide con tus movimientos. Muestra un punto por día, o por semana en los períodos largos, y abajo podés ver la tabla con los valores.",
+      },
+      {
         pregunta: "¿Cómo cambio mis datos o cierro sesión?",
         respuesta: "Desde Configuración podés editar tu nombre y correo, y cerrar sesión.",
       },

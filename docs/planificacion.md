@@ -25,7 +25,8 @@ Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arb
 | `EstadoCarga` | pantalla de "cargando" o de error mientras llegan los datos | App |
 | `FormularioMovimiento` | formulario controlado de gasto o ingreso (mismo componente, cambia por props) | Inicio, Panel de movimiento |
 | `SelectorCategoria` | lista de categorías con "Nueva categoría…" para crear una propia | Formulario de movimiento, Tarjetas |
-| `PanelGrafico` | caja con título que envuelve cada gráfico | Estadísticas (4 veces) |
+| `PanelGrafico` | caja con título que envuelve cada gráfico | Estadísticas (5 veces) |
+| `GraficoPatrimonio` | progreso del patrimonio en áreas apiladas (disponible, ahorros y reserva) con frase de resumen, leyenda y tabla de valores en un `<details>` | Estadísticas |
 | `PanelAyuda` | panel lateral con preguntas frecuentes (cada una es un `<details>`) | App (desde el menú) |
 | `Iconos` | íconos SVG en línea (volver, cerrar, avanzar, menú, flecha y uno por tipo de movimiento: ingreso, gasto, ahorro y tarjeta); toman el color del elemento que los contiene | Header, Modal, PanelLateral, PanelObjetivo, PanelMovimiento, SelectorIcono, Ahorros, Movimientos |
 
@@ -83,4 +84,6 @@ Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arb
 ## Datos (estado actual)
 
 - No hay backend: el inicio de sesión es simulado y los datos de ejemplo salen de `public/data/patrimonio.json`.
+- Las reglas de cada movimiento (cuánto cambian disponible, ahorros y reserva) están en una sola función pura, `efectoMovimiento` (`src/utils/reglasPatrimonio.js`). La usa `usePatrimonio` para aplicar las acciones y `historialPatrimonio` (`src/utils/historialPatrimonio.js`) para el gráfico de progreso: el historial no se guarda, se reconstruye hacia atrás desde los valores de hoy deshaciendo cada movimiento, con un punto por día, semana o mes (hasta unos 60).
+- Pagar un período de tarjeta sale de la reserva: el disponible no cambia y el patrimonio baja una sola vez por el monto pagado.
 - El backend está en pausa hasta definir con el profesor si se hace con PHP + MySQL o con Node.

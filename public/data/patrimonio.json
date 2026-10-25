@@ -79,6 +79,15 @@
       "diasAtras": 0
     },
     {
+      "id": 17,
+      "tipo": "gasto",
+      "categoria": "Hogar",
+      "descripcion": "Alquiler",
+      "monto": 450000,
+      "signo": "-",
+      "diasAtras": 0
+    },
+    {
       "id": 2,
       "tipo": "gasto",
       "categoria": "Supermercado",
@@ -161,6 +170,15 @@
       "diasAtras": 33
     },
     {
+      "id": 18,
+      "tipo": "gasto",
+      "categoria": "Hogar",
+      "descripcion": "Alquiler",
+      "monto": 450000,
+      "signo": "-",
+      "diasAtras": 33
+    },
+    {
       "id": 11,
       "tipo": "gasto",
       "categoria": "Supermercado",
@@ -194,6 +212,15 @@
       "descripcion": "",
       "monto": 650000,
       "signo": "+",
+      "diasAtras": 63
+    },
+    {
+      "id": 19,
+      "tipo": "gasto",
+      "categoria": "Hogar",
+      "descripcion": "Alquiler",
+      "monto": 450000,
+      "signo": "-",
       "diasAtras": 63
     },
     {

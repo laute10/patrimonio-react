@@ -2,7 +2,7 @@
 
 ## Árbol de componentes
 
-Ver `arbol-de-componentes.svg`. `App` decide qué se ve según tres estados (`usuario`, `pantallaAcceso` para login / crear cuenta / recuperar, y `paginaActual`) y reparte los datos a cada pantalla por props.
+Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arbol` (script `scripts/generar-arbol.mjs`, que lee los `import` y el estado del código), así que hay que volver a correrlo al agregar un componente. `App` decide qué se ve según tres estados (`usuario`, `pantallaAcceso` para login / crear cuenta / recuperar, y `paginaActual`) y reparte los datos a cada pantalla por props.
 
 ## Componentes reutilizables (se escriben una sola vez)
 

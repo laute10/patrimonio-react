@@ -149,7 +149,7 @@
 <text x="235.5" y="1127" text-anchor="start" font-size="20" font-weight="500" fill="#334155">Lo usan: Ahorros, Configuración, Inicio, Modal, PanelAyuda, PanelMovimiento, PanelObjetivo y Tarjetas</text>
 <rect x="40" y="1158" width="121" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
 <text x="100.5" y="1192" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Iconos</text>
-<text x="235.5" y="1191" text-anchor="start" font-size="20" font-weight="500" fill="#334155">Lo usan: Ahorros, Header, Modal, Movimientos, PanelLateral, PanelObjetivo y SelectorIcono</text>
+<text x="235.5" y="1191" text-anchor="start" font-size="20" font-weight="500" fill="#334155">Lo usan: Ahorros, Header, Modal, Movimientos, PanelLateral, PanelMovimiento, PanelObjetivo y SelectorIcono</text>
 <rect x="40" y="1222" width="176" height="52" rx="26" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" stroke-dasharray="7 5"/>
 <text x="128" y="1256" text-anchor="middle" font-size="24" font-weight="500" fill="#1E3A8A">Componente</text>
 <text x="235.5" y="1255" text-anchor="start" font-size="20" font-weight="500" fill="#334155">Borde punteado: el componente usa otros, pero se detalla en otra rama.</text>

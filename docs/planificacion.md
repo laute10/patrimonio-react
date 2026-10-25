@@ -27,7 +27,7 @@ Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arb
 | `SelectorCategoria` | lista de categorías con "Nueva categoría…" para crear una propia | Formulario de movimiento, Tarjetas |
 | `PanelGrafico` | caja con título que envuelve cada gráfico | Estadísticas (4 veces) |
 | `PanelAyuda` | panel lateral con preguntas frecuentes (cada una es un `<details>`) | App (desde el menú) |
-| `Iconos` | íconos SVG en línea (volver, cerrar, avanzar, menú, flecha); toman el color del botón | Header, Modal, PanelLateral, PanelObjetivo, SelectorIcono, Ahorros, Movimientos |
+| `Iconos` | íconos SVG en línea (volver, cerrar, avanzar, menú, flecha y uno por tipo de movimiento: ingreso, gasto, ahorro y tarjeta); toman el color del elemento que los contiene | Header, Modal, PanelLateral, PanelObjetivo, PanelMovimiento, SelectorIcono, Ahorros, Movimientos |
 
 ## Datos y estado
 

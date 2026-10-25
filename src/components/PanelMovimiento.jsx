@@ -3,6 +3,7 @@ import Overlay from "./Overlay";
 import PanelLateral from "./PanelLateral";
 import Modal from "./Modal";
 import FormularioMovimiento from "./FormularioMovimiento";
+import { IconoTipoMovimiento } from "./Iconos";
 import {
   clasificar,
   etiquetaClase,
@@ -60,7 +61,6 @@ function PanelMovimiento({
 
   const clase = clasificar(movimiento.tipo);
   const editable = movimiento.tipo === "ingreso" || movimiento.tipo === "gasto";
-  const icono = { ingreso: "↑", gasto: "↓", ahorro: "$", tarjeta: "C" }[clase];
   const signo = movimiento.signo === "+" ? "+ " : movimiento.signo === "-" ? "- " : "";
   const datosConsumo = clase === "tarjeta" ? buscarConsumo(tarjetas, movimiento.consumoId) : null;
 
@@ -137,7 +137,7 @@ function PanelMovimiento({
         >
           <div className="detalle-mov__cabecera">
             <span className={`item-movimiento__icono item-movimiento__icono--${clase} detalle-mov__icono`} aria-hidden="true">
-              {icono}
+              <IconoTipoMovimiento tipo={clase} tamano={22} />
             </span>
             <div>
               <h3 className="detalle-mov__titulo">{datosConsumo ? datosConsumo.consumo.categoria : movimiento.categoria}</h3>

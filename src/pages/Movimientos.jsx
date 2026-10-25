@@ -1,4 +1,4 @@
-import { IconoCerrar } from "../components/Iconos";
+import { IconoCerrar, IconoTipoMovimiento } from "../components/Iconos";
 import { useState } from "react";
 import PanelMovimiento from "../components/PanelMovimiento";
 import { clasificar, formatearMonto, formatearTipo } from "../utils/formato";
@@ -242,12 +242,11 @@ function Movimientos({
               <div className="lista-movimientos">
                 {grupo.items.map((mov) => {
                   const tipoClasificado = clasificar(mov.tipo);
-                  const icono = { ingreso: "↑", gasto: "↓", ahorro: "$", tarjeta: "C" }[tipoClasificado];
 
                   return (
                     <button type="button" className="item-movimiento" key={mov.id} onClick={() => setSeleccionadoId(mov.id)}>
                       <span className={`item-movimiento__icono item-movimiento__icono--${tipoClasificado}`} aria-hidden="true">
-                        {icono}
+                        <IconoTipoMovimiento tipo={tipoClasificado} tamano={18} />
                       </span>
                       <div className="item-movimiento__info">
                         <span className="item-movimiento__titulo">{mov.categoria}</span>

@@ -16,7 +16,8 @@ import { efectoMovimiento } from "../utils/reglasPatrimonio";
 // - Agregar/Retirar ahorro: transferencia interna (Patrimonio no cambia)
 // - Usar ahorro para comprar: SÍ reduce el Patrimonio (gasto real)
 // - Compra con tarjeta: Disponible -> Reserva, Patrimonio no cambia
-// - Pagar período: reduce Disponible, Reserva y Patrimonio
+// - Pagar período: sale de la Reserva; Disponible no cambia y el
+//   Patrimonio baja una sola vez por el monto pagado
 // ==========================================================================
 
 let siguienteIdMovimiento = 100;
@@ -397,24 +398,15 @@ function usePatrimonio() {
     );
   }
 
-  // Devuelve true si se pagó, false si no alcanza el dinero disponible.
+  // Devuelve true si se pagó, false si el período no existe o ya estaba pagado.
+  // No hace falta controlar el disponible: el dinero quedó reservado con
+  // cada consumo. Al pasar a PAGADA, el período deja de sumar a la Reserva.
   function pagarPeriodo(tarjetaId, periodoId) {
     const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
     const periodo = tarjeta && tarjeta.periodos.find((p) => p.id === periodoId);
     if (!periodo || periodo.estado === "PAGADA") return false;
 
     const deuda = deudaPeriodo(periodo);
-    if (deuda > disponible) return false;
-
-    const datos = {
-      tipo: "tarjeta-pago",
-      categoria: `Pago ${tarjeta.nombre} - ${etiquetaPeriodo(periodo)}`,
-      descripcion: "",
-      monto: deuda,
-      signo: "-",
-    };
-    const efecto = efectoMovimiento(datos);
-    setDisponible((actual) => actual + efecto.disponible);
     setTarjetas((anteriores) =>
       anteriores.map((t) =>
         t.id !== tarjetaId
@@ -422,7 +414,13 @@ function usePatrimonio() {
           : { ...t, periodos: t.periodos.map((p) => (p.id === periodoId ? { ...p, estado: "PAGADA" } : p)) }
       )
     );
-    agregarMovimiento(datos);
+    agregarMovimiento({
+      tipo: "tarjeta-pago",
+      categoria: `Pago ${tarjeta.nombre} - ${etiquetaPeriodo(periodo)}`,
+      descripcion: "",
+      monto: deuda,
+      signo: "-",
+    });
     return true;
   }
 

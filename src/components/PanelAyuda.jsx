@@ -90,7 +90,7 @@ const SECCIONES = [
       {
         pregunta: "¿Qué pasa cuando pago un período?",
         respuesta:
-          "Se descuenta de tu dinero disponible y de la reserva, y tu patrimonio baja en ese monto. Para pagar necesitás tener disponible suficiente.",
+          "Se paga con la reserva de la tarjeta, que ya guardaste con cada consumo: tu dinero disponible no cambia y tu patrimonio baja una sola vez, en el monto pagado.",
       },
     ],
   },

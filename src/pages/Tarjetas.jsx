@@ -49,7 +49,6 @@ function Tarjetas({
   const [resumenActual, setResumenActual] = useState(null); // { tarjetaId, periodoId }
   const [panelAbierto, setPanelAbierto] = useState(null);
   const [modal, setModal] = useState(null);
-  const [errorModal, setErrorModal] = useState("");
 
   const [filtroTarjeta, setFiltroTarjeta] = useState("todas");
   const [filtroEstado, setFiltroEstado] = useState("todos");
@@ -89,19 +88,16 @@ function Tarjetas({
   function cerrarPanel() {
     setPanelAbierto(null);
     setModal(null);
-    setErrorModal("");
   }
 
   // La flecha "←" y "Cancelar" de los paneles de consumo vuelven al resumen.
   function volverAlResumen() {
     setPanelAbierto("resumen");
     setModal(null);
-    setErrorModal("");
   }
 
   function cerrarModal() {
     setModal(null);
-    setErrorModal("");
   }
 
   // -- Agregar tarjeta -----------------------------------------------------
@@ -175,11 +171,9 @@ function Tarjetas({
   }
 
   function confirmarPagarPeriodo() {
-    const pagado = pagarPeriodo(resumenActual.tarjetaId, resumenActual.periodoId);
-    if (!pagado) {
-      setErrorModal("No tenés dinero disponible suficiente para pagar este período");
-      return;
-    }
+    // El dinero ya está reservado desde cada consumo, así que el pago
+    // siempre se puede hacer (el botón solo aparece en períodos sin pagar).
+    pagarPeriodo(resumenActual.tarjetaId, resumenActual.periodoId);
     // Volvemos al resumen, que ahora se ve como PAGADA (sin botón de pago).
     cerrarModal();
   }
@@ -538,9 +532,9 @@ function Tarjetas({
             <p className="modal__titulo">¿Pagar período?</p>
             <p className="modal__texto">
               Vas a pagar {formatearMonto(deudaResumen)} correspondientes al período {mesResumen} de tu
-              tarjeta {tarjetaResumen.nombre}. Este pago reducirá tu patrimonio disponible.
+              tarjeta {tarjetaResumen.nombre}. El pago sale de la reserva de la tarjeta: tu dinero
+              disponible no cambia y tu patrimonio baja en ese monto.
             </p>
-            {errorModal !== "" && <p className="mensaje-error">{errorModal}</p>}
             <div className="modal__acciones">
               <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal}>
                 Cancelar

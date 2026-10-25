@@ -26,8 +26,10 @@ export function efectoMovimiento({ tipo, monto }) {
     // Compra con tarjeta: el dinero pasa de Disponible a Reserva.
     case "tarjeta-consumo":
       return { disponible: -monto, ahorros: 0, reserva: monto };
+    // Pago de la tarjeta: el dinero ya reservado se va. Disponible no cambia
+    // y el patrimonio baja una sola vez por el monto pagado.
     case "tarjeta-pago":
-      return { disponible: -monto, ahorros: 0, reserva: -monto };
+      return { disponible: 0, ahorros: 0, reserva: -monto };
     default:
       return { disponible: 0, ahorros: 0, reserva: 0 };
   }

@@ -50,3 +50,4 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 - Explicar paso a paso, sin suponer que ya sabe hacer algo (Windows, terminal, git).
 - Antes de cambios grandes, resumir qué se va a tocar. Después de cada cambio: `npm run build` y `npm run lint`.
 - Commits en español, claros y chicos. No tocar el README sin avisar (tiene el link de Netlify).
+- Nunca ejecutar git push: lo hace el autor una vez por sesión de trabajo.

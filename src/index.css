@@ -1407,12 +1407,14 @@ button.consumo-fila:hover {
   display: flex;
   align-items: flex-end;
   gap: var(--espacio-6);
+  min-width: 0;
   height: 200px;
   padding-top: var(--espacio-4);
 }
 
 .barras-dobles-grupo {
   flex: 1;
+  min-width: 0; /* deja que los grupos se achiquen en vez de desbordar */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1424,12 +1426,16 @@ button.consumo-fila:hover {
 .barras-dobles-par {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
+  justify-content: center;
+  gap: 2px;
   height: 100%;
+  width: 100%;
 }
 
 .barras-dobles-barra {
-  width: 24px;
+  flex: 1 1 0;
+  min-width: 2px;
+  max-width: 24px;
   border-radius: 4px 4px 0 0;
 }
 
@@ -2705,4 +2711,19 @@ input:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: var(--espacio-1);
+}
+
+/* Con muchos meses (último año) en pantallas chicas, el gráfico se compacta */
+@media (max-width: 640px) {
+  .grafico-barras-dobles {
+    gap: 4px;
+  }
+
+  .grafico-barras-dobles .barra-v-etiqueta {
+    font-size: 10px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
 }

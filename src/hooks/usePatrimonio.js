@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ICONOS, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../utils/formato";
+import { efectoMovimiento } from "../utils/reglasPatrimonio";
 
 // ==========================================================================
 // usePatrimonio - estado financiero compartido de toda la app.
@@ -8,7 +9,8 @@ import { ICONOS, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../utils/formato";
 // (documento de especificación, sección 39: Inicio, Movimientos y
 // Estadísticas deben consultar los mismos datos, no lógica duplicada).
 //
-// Reglas financieras implementadas (sección 4 a 26 del documento):
+// Reglas financieras implementadas (sección 4 a 26 del documento); cuánto
+// cambia cada parte está definido en utils/reglasPatrimonio.js:
 // - Patrimonio Total = Disponible + Ahorros + Reserva de tarjeta
 // - Ingreso/Gasto: cambia Disponible y Patrimonio
 // - Agregar/Retirar ahorro: transferencia interna (Patrimonio no cambia)
@@ -144,13 +146,17 @@ function usePatrimonio() {
   // -- Ingresos y gastos (sección 11-12) ----------------------------------
 
   function registrarIngreso({ categoria, monto, descripcion }) {
-    setDisponible((actual) => actual + monto);
-    agregarMovimiento({ tipo: "ingreso", categoria, descripcion, monto, signo: "+" });
+    const datos = { tipo: "ingreso", categoria, descripcion, monto, signo: "+" };
+    const efecto = efectoMovimiento(datos);
+    setDisponible((actual) => actual + efecto.disponible);
+    agregarMovimiento(datos);
   }
 
   function registrarGasto({ categoria, monto, descripcion }) {
-    setDisponible((actual) => actual - monto);
-    agregarMovimiento({ tipo: "gasto", categoria, descripcion, monto, signo: "-" });
+    const datos = { tipo: "gasto", categoria, descripcion, monto, signo: "-" };
+    const efecto = efectoMovimiento(datos);
+    setDisponible((actual) => actual + efecto.disponible);
+    agregarMovimiento(datos);
   }
 
   // -- Ahorros y objetivos (sección 13-16) --------------------------------
@@ -181,17 +187,28 @@ function usePatrimonio() {
     );
   }
 
-  function agregarAhorro({ objetivoId, monto, descripcion }) {
-    setDisponible((actual) => actual - monto);
+  // Agregar, retirar y usar ahorro comparten el mismo camino: el efecto del
+  // movimiento dice cuánto cambian el disponible y el objetivo.
+  function moverAhorro(datos) {
+    const efecto = efectoMovimiento(datos);
+    setDisponible((actual) => actual + efecto.disponible);
     setObjetivos((anteriores) =>
       anteriores.map((obj) =>
-        obj.id === objetivoId ? { ...obj, montoActual: obj.montoActual + monto } : obj
+        obj.id === datos.objetivoId ? { ...obj, montoActual: obj.montoActual + efecto.ahorros } : obj
       )
     );
+    agregarMovimiento(datos);
+  }
+
+  function nombreObjetivo(objetivoId) {
     const objetivo = objetivos.find((obj) => obj.id === objetivoId);
-    agregarMovimiento({
+    return objetivo ? objetivo.nombre : "";
+  }
+
+  function agregarAhorro({ objetivoId, monto, descripcion }) {
+    moverAhorro({
       tipo: "ahorro-agregado",
-      categoria: objetivo ? objetivo.nombre : "",
+      categoria: nombreObjetivo(objetivoId),
       objetivoId,
       descripcion,
       monto,
@@ -200,16 +217,9 @@ function usePatrimonio() {
   }
 
   function retirarAhorro({ objetivoId, monto, descripcion }) {
-    setDisponible((actual) => actual + monto);
-    setObjetivos((anteriores) =>
-      anteriores.map((obj) =>
-        obj.id === objetivoId ? { ...obj, montoActual: obj.montoActual - monto } : obj
-      )
-    );
-    const objetivo = objetivos.find((obj) => obj.id === objetivoId);
-    agregarMovimiento({
+    moverAhorro({
       tipo: "ahorro-retirado",
-      categoria: objetivo ? objetivo.nombre : "",
+      categoria: nombreObjetivo(objetivoId),
       objetivoId,
       descripcion,
       monto,
@@ -220,15 +230,9 @@ function usePatrimonio() {
   function usarAhorro({ objetivoId, monto, descripcion }) {
     // A diferencia de agregar/retirar, usar el ahorro para comprar algo
     // SÍ es un gasto real: el Patrimonio baja (sección 6 del documento).
-    setObjetivos((anteriores) =>
-      anteriores.map((obj) =>
-        obj.id === objetivoId ? { ...obj, montoActual: obj.montoActual - monto } : obj
-      )
-    );
-    const objetivo = objetivos.find((obj) => obj.id === objetivoId);
-    agregarMovimiento({
+    moverAhorro({
       tipo: "ahorro-usado",
-      categoria: objetivo ? objetivo.nombre : "",
+      categoria: nombreObjetivo(objetivoId),
       objetivoId,
       descripcion,
       monto,
@@ -256,7 +260,8 @@ function usePatrimonio() {
     const mov = movimientos.find((m) => m.id === id);
     if (!mov || (mov.tipo !== "ingreso" && mov.tipo !== "gasto")) return false;
 
-    const impacto = mov.tipo === "ingreso" ? monto - mov.monto : mov.monto - monto;
+    // Lo que cambia el disponible es el efecto nuevo menos el que tenía.
+    const impacto = efectoMovimiento({ ...mov, monto }).disponible - efectoMovimiento(mov).disponible;
     if (disponible + impacto < 0) return false;
 
     setDisponible((actual) => actual + impacto);
@@ -270,7 +275,8 @@ function usePatrimonio() {
     const mov = movimientos.find((m) => m.id === id);
     if (!mov || (mov.tipo !== "ingreso" && mov.tipo !== "gasto")) return false;
 
-    const impacto = mov.tipo === "ingreso" ? -mov.monto : mov.monto;
+    // Eliminar deshace el efecto del movimiento.
+    const impacto = -efectoMovimiento(mov).disponible;
     if (disponible + impacto < 0) return false;
 
     setDisponible((actual) => actual + impacto);
@@ -316,20 +322,23 @@ function usePatrimonio() {
     // Sección 24: Disponible BAJA y Reserva SUBE en la misma medida,
     // por eso el Patrimonio total no cambia.
     const consumoId = nuevoId();
-    setDisponible((actual) => actual - monto);
-    modificarPeriodoAbierto(tarjetaId, (p) => ({
-      ...p,
-      consumos: [...p.consumos, { id: consumoId, categoria, descripcion, monto }],
-    }));
     const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
-    agregarMovimiento({
+    const datos = {
       tipo: "tarjeta-consumo",
       categoria: tarjeta ? tarjeta.nombre : "",
       descripcion,
       monto,
       signo: null, // transferencia a "reservado", no afecta el patrimonio
       consumoId, // vínculo para mantener el movimiento sincronizado
-    });
+    };
+    // La reserva sube sola: se calcula sumando los consumos del período.
+    const efecto = efectoMovimiento(datos);
+    setDisponible((actual) => actual + efecto.disponible);
+    modificarPeriodoAbierto(tarjetaId, (p) => ({
+      ...p,
+      consumos: [...p.consumos, { id: consumoId, categoria, descripcion, monto }],
+    }));
+    agregarMovimiento(datos);
   }
 
   function editarConsumoTarjeta({ tarjetaId, consumoId, categoria, monto, descripcion }) {
@@ -339,7 +348,10 @@ function usePatrimonio() {
     if (!anterior) return;
 
     // Si el monto sube, baja Disponible y sube la deuda (y al revés).
-    setDisponible((actual) => actual - (monto - anterior.monto));
+    const consumo = { tipo: "tarjeta-consumo" };
+    const impacto =
+      efectoMovimiento({ ...consumo, monto }).disponible - efectoMovimiento({ ...consumo, monto: anterior.monto }).disponible;
+    setDisponible((actual) => actual + impacto);
     modificarPeriodoAbierto(tarjetaId, (p) => ({
       ...p,
       consumos: p.consumos.map((c) => (c.id === consumoId ? { ...c, categoria, monto, descripcion } : c)),
@@ -355,8 +367,9 @@ function usePatrimonio() {
     const consumo = abierto && abierto.consumos.find((c) => c.id === consumoId);
     if (!consumo) return;
 
-    // El dinero reservado vuelve a estar disponible.
-    setDisponible((actual) => actual + consumo.monto);
+    // El dinero reservado vuelve a estar disponible (se deshace el consumo).
+    const impacto = -efectoMovimiento({ tipo: "tarjeta-consumo", monto: consumo.monto }).disponible;
+    setDisponible((actual) => actual + impacto);
     modificarPeriodoAbierto(tarjetaId, (p) => ({
       ...p,
       consumos: p.consumos.filter((c) => c.id !== consumoId),
@@ -393,7 +406,15 @@ function usePatrimonio() {
     const deuda = deudaPeriodo(periodo);
     if (deuda > disponible) return false;
 
-    setDisponible((actual) => actual - deuda);
+    const datos = {
+      tipo: "tarjeta-pago",
+      categoria: `Pago ${tarjeta.nombre} - ${etiquetaPeriodo(periodo)}`,
+      descripcion: "",
+      monto: deuda,
+      signo: "-",
+    };
+    const efecto = efectoMovimiento(datos);
+    setDisponible((actual) => actual + efecto.disponible);
     setTarjetas((anteriores) =>
       anteriores.map((t) =>
         t.id !== tarjetaId
@@ -401,13 +422,7 @@ function usePatrimonio() {
           : { ...t, periodos: t.periodos.map((p) => (p.id === periodoId ? { ...p, estado: "PAGADA" } : p)) }
       )
     );
-    agregarMovimiento({
-      tipo: "tarjeta-pago",
-      categoria: `Pago ${tarjeta.nombre} - ${etiquetaPeriodo(periodo)}`,
-      descripcion: "",
-      monto: deuda,
-      signo: "-",
-    });
+    agregarMovimiento(datos);
     return true;
   }
 

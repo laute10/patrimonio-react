@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ICONOS, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../utils/formato";
 import { efectoMovimiento } from "../utils/reglasPatrimonio";
+import { pedir } from "../utils/api";
 
 // ==========================================================================
 // usePatrimonio - estado financiero compartido de toda la app.
@@ -55,18 +56,11 @@ function siguienteMes(periodo) {
     : { mes: periodo.mes + 1, anio: periodo.anio };
 }
 
-// Convierte "diasAtras" del JSON en una fecha real.
-function convertirMovimiento(mov) {
-  const fecha = new Date();
-  fecha.setDate(fecha.getDate() - mov.diasAtras);
-  return { ...mov, fecha };
-}
-
 function usePatrimonio() {
-  // Los datos ya NO están escritos en el código: se piden al archivo
-  // public/data/patrimonio.json con fetch dentro de un useEffect.
-  // (useEffect y fetch los pide la Ejercitación 4.1; en la unidad 4 de la
-  // cátedra el estado "cargando / error / datos" se simula con setTimeout.)
+  // El estado inicial se pide a la API (GET /patrimonio) con fetch dentro
+  // de un useEffect, a través de pedir() (utils/api.js).
+  // Por ahora los cambios siguen siendo locales: se pierden al recargar
+  // hasta que cada acción pase a usar la API.
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [intento, setIntento] = useState(0); // al cambiar, se vuelve a pedir
@@ -79,39 +73,28 @@ function usePatrimonio() {
   const [categoriasIngresoPropias, setCategoriasIngresoPropias] = useState([]);
 
   useEffect(() => {
-    fetch("data/patrimonio.json")
-      .then((respuesta) => {
-        if (!respuesta.ok) {
-          throw new Error("Respuesta " + respuesta.status);
-        }
-        return respuesta.json();
-      })
+    pedir("/patrimonio")
       .then((datos) => {
         setDisponible(datos.disponible);
-        // Cada objetivo tiene su ícono; los movimientos de ahorro se
-        // vinculan al objetivo por id (antes solo guardaban el nombre).
-        const objetivosConIcono = datos.objetivos.map((obj, indice) => ({
-          icono: ICONOS[indice % ICONOS.length],
-          ...obj,
-        }));
-        setObjetivos(objetivosConIcono);
-        setTarjetas(datos.tarjetas);
-        // El JSON guarda "diasAtras" para que el ejemplo nunca quede viejo;
-        // una API real devolvería la fecha ya calculada.
-        setMovimientos(
-          datos.movimientos.map((mov) => {
-            const convertido = convertirMovimiento(mov);
-            if (mov.tipo.startsWith("ahorro")) {
-              const objetivo = objetivosConIcono.find((obj) => obj.nombre === mov.categoria);
-              convertido.objetivoId = objetivo ? objetivo.id : null;
-            }
-            return convertido;
-          })
+        // Cada objetivo guarda su ícono; si alguno no lo tiene, se le
+        // asigna uno según su posición.
+        setObjetivos(
+          datos.objetivos.map((obj, indice) => ({
+            icono: ICONOS[indice % ICONOS.length],
+            ...obj,
+          }))
         );
+        setTarjetas(datos.tarjetas);
+        // La API manda la fecha como texto ISO; la app trabaja con Date.
+        setMovimientos(datos.movimientos.map((mov) => ({ ...mov, fecha: new Date(mov.fecha) })));
+        setCategoriasPropias(datos.categoriasPropias.gasto);
+        setCategoriasIngresoPropias(datos.categoriasPropias.ingreso);
         setCargando(false);
       })
-      .catch(() => {
-        setError("No pudimos cargar tus datos. Revisá tu conexión e intentá de nuevo.");
+      .catch((err) => {
+        // El mensaje ya viene listo de pedir(): el { error } de la API o el
+        // aviso de que no se pudo conectar.
+        setError(err.message);
         setCargando(false);
       });
   }, [intento]);

@@ -41,7 +41,7 @@ Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arb
 | `parametros` | `App` | filtros que una pantalla le pasa a otra al navegar |
 | `ayudaAbierta` | `App` | si se ve el panel de Ayuda |
 | `tema` | `App` | modo claro u oscuro (se recuerda en `localStorage`) |
-| `disponible`, `objetivos`, `tarjetas`, `movimientos` | `usePatrimonio` (usado en `App`) | datos financieros: datos de ejemplo pedidos con `fetch` a `public/data/patrimonio.json`; los cambios viven solo en memoria (se pierden al recargar) |
+| `disponible`, `objetivos`, `tarjetas`, `movimientos` | `usePatrimonio` (usado en `App`) | datos financieros: el estado inicial se pide a la API (`GET /api/patrimonio`) con `pedir()` de `src/utils/api.js`; por ahora los cambios viven solo en memoria (se pierden al recargar) |
 | `categoriasPropias`, `categoriasIngresoPropias` | `usePatrimonio` | categorías de gasto e ingreso creadas por el usuario |
 | `cargando`, `error` | `usePatrimonio` | pantalla de carga / de error |
 | `periodoId` | `Estadisticas` | período que muestran los gráficos |
@@ -83,7 +83,7 @@ Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arb
 
 ## Datos (estado actual)
 
-- No hay backend: el inicio de sesión es simulado y los datos de ejemplo salen de `public/data/patrimonio.json`.
+- El inicio de sesión es simulado. Los datos salen del backend (carpeta `backend/` del repo, Node + Express), que los guarda en un archivo JSON. La dirección de la API se toma de `VITE_API_URL` (archivo `.env`). Si el backend no responde, la app muestra el estado de error con "Reintentar".
 - Las reglas de cada movimiento (cuánto cambian disponible, ahorros y reserva) están en una sola función pura, `efectoMovimiento` (`src/utils/reglasPatrimonio.js`). La usa `usePatrimonio` para aplicar las acciones y `historialPatrimonio` (`src/utils/historialPatrimonio.js`) para el gráfico de progreso: el historial no se guarda, se reconstruye hacia atrás desde los valores de hoy deshaciendo cada movimiento, con un punto por día, semana o mes (hasta unos 60).
 - Pagar un período de tarjeta sale de la reserva: el disponible no cambia y el patrimonio baja una sola vez por el monto pagado.
-- El backend está en pausa hasta definir con el profesor si se hace con PHP + MySQL o con Node.
+- Migración al backend en curso (Ejercitación 5.1): por ahora solo la carga inicial usa la API; las acciones se irán pasando una por una.

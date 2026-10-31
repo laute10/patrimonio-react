@@ -10,12 +10,15 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 ## Estado
 - Entregadas: Ejercitación 3.1 (HTML/CSS/JS) y 4.1 (React). Lighthouse 100 en Accessibility y Best practices en las 9 pantallas.
 - Hecho además: ventana de Ayuda, modo oscuro, categorías propias, 36 íconos para objetivos, íconos SVG de volver/cerrar, flujos de Figma (detalle de objetivos y movimientos, filtros).
-- **Backend en pausa** hasta que el autor hable con el profesor (el examen final pide PHP + MySQL; las ejercitaciones 5.1/5.2 usan Node). No empezarlo sin que el autor lo confirme. Hoy los datos son simulados en `usePatrimonio` y se pierden al recargar; la autenticación es simulada.
+- **Backend en curso** (Ejercitación 5.1) en la rama `full-stack`: Node + Express en `backend/`, con lo visto en la unidad 5. Ya está el esqueleto (paso 1 del plan); el frontend todavía lee `public/data/patrimonio.json` y los cambios se pierden al recargar hasta migrar cada parte. La autenticación sigue simulada.
+- No mergear `full-stack` a `main` sin decidir antes dónde se publica la API: Netlify no ejecuta Node.
+- Lista de control oficial de la 5.1: (1) todos los endpoints responden con el código correcto, también en errores; (2) una ruta inexistente devuelve 404 en JSON; (3) los cambios desde la interfaz se guardan en el JSON y siguen al reiniciar el servidor; (4) el frontend toma la API de `VITE_API_URL`; (5) sin errores en la consola del navegador ni en la terminal del servidor; (6) siguiendo el README otra persona puede clonar y ejecutar ambas partes; (7) se puede recorrer el user flow completo con datos reales.
 
 ## Comandos
 - `npm run dev` — servidor de desarrollo
 - `npm run build` — compila (debe pasar sin errores antes de cada commit)
-- `npm run lint` — oxlint (debe quedar sin errores)
+- `npm run lint` — oxlint (debe quedar sin errores; también revisa `backend/`)
+- En `backend/`: `npm run dev` (con `node --watch`) o `npm start`. Puerto desde `process.env.PORT`, 3000 por defecto.
 
 ## Reglas del curso (no romperlas)
 - Solo herramientas vistas en el curso: React 19 + Vite. **Sin** React Router, Context, ni librerías de UI o de gráficos.
@@ -24,6 +27,8 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 - Mayúsculas solo con CSS (`text-transform`) en elementos de interfaz; el contenido se escribe en minúscula/normal.
 - Componentes funcionales con hooks; un componente por archivo; props explícitas.
 - Antes de usar `localStorage` o algo nuevo, tiene que estar dentro de lo visto en el curso (el tema oscuro ya usa localStorage con try/catch).
+- Backend: solo Node + Express (módulos ES), `express.Router()`, controladores, middlewares y persistencia en un archivo JSON con `fs/promises`. **Sin** base de datos, **sin** librerías de validación (se valida a mano) y sin generadores de proyectos. Dependencias: solo `express` y `cors`.
+- El frontend toma la dirección de la API de `VITE_API_URL` (en `.env`), nunca escrita a mano.
 
 ## Estructura
 - `src/App.jsx` — raíz: sesión, navegación, tema (clase `tema-oscuro` en un div envolvente).
@@ -33,6 +38,9 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 - `src/utils/formato.js` — formato de montos/fechas, íconos y categorías predeterminadas. `validacion.js` — validaciones.
 - `src/index.css` — todos los estilos; colores en variables de `:root`, modo oscuro redefine las variables en `.tema-oscuro`. No usar colores fijos: crear/usar variables.
 - `docs/` — planificación y árbol de componentes (actualizar al agregar componentes).
+- `backend/src/index.js` — arma la app de Express: middlewares, rutas, 404 y errores.
+- `backend/src/routes/` (un `express.Router()` por recurso), `controllers/`, `middlewares/` (registro, noEncontrado, manejoErrores), `data/` (archivo JSON), y más adelante `reglas/` (`efectoMovimiento`), `validaciones/` y `servicios/`.
+- Errores de la API siempre en JSON: `{ "error": "mensaje en español" }`. Códigos: 200, 201, 204, 400, 404 y 500.
 
 ## Modelo financiero
 - Patrimonio = Disponible + Ahorros + Reserva de tarjeta.

@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import saludRouter from "./routes/salud.js";
+import patrimonioRouter from "./routes/patrimonio.js";
+import { inicializarDatos } from "./servicios/datos.js";
 import registro from "./middlewares/registro.js";
 import noEncontrado from "./middlewares/noEncontrado.js";
 import manejoErrores from "./middlewares/manejoErrores.js";
@@ -22,9 +24,13 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/salud", saludRouter);
+app.use("/api/patrimonio", patrimonioRouter);
 
 app.use(noEncontrado);
 app.use(manejoErrores);
+
+// Antes de aceptar pedidos, nos aseguramos de que exista el archivo de datos.
+await inicializarDatos();
 
 app.listen(PUERTO, () => {
   console.log(`Servidor escuchando en http://localhost:${PUERTO}`);

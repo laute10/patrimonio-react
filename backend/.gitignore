@@ -1,1 +1,4 @@
 node_modules
+
+# Datos reales: se crean a partir de src/data/semilla.json al arrancar
+src/data/patrimonio.json

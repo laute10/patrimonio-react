@@ -52,3 +52,22 @@ export async function leerDatos() {
 export async function guardarDatos(datos) {
   await writeFile(ARCHIVO_DATOS, JSON.stringify(datos, null, 2) + "\n", "utf8");
 }
+
+// Todas las escrituras pasan por acá: lee el archivo, aplica "cambiar" y
+// guarda UNA sola vez. Si "cambiar" lanza un error (una regla que no se
+// cumple), no se guarda nada.
+// Las operaciones se hacen de a una, en fila: si llegan dos pedidos juntos
+// (un doble clic), el segundo espera al primero y ninguno pisa al otro.
+let fila = Promise.resolve();
+
+export function modificarDatos(cambiar) {
+  const operacion = fila.then(async () => {
+    const datos = await leerDatos();
+    const resultado = cambiar(datos);
+    await guardarDatos(datos);
+    return resultado;
+  });
+  // Si esta operación falla, la fila sigue para las que vienen después.
+  fila = operacion.catch(() => {});
+  return operacion;
+}

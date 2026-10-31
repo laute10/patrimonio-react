@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import saludRouter from "./routes/salud.js";
 import patrimonioRouter from "./routes/patrimonio.js";
+import movimientosRouter from "./routes/movimientos.js";
 import { inicializarDatos } from "./servicios/datos.js";
 import registro from "./middlewares/registro.js";
 import noEncontrado from "./middlewares/noEncontrado.js";
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use("/api/salud", saludRouter);
 app.use("/api/patrimonio", patrimonioRouter);
+app.use("/api/movimientos", movimientosRouter);
 
 app.use(noEncontrado);
 app.use(manejoErrores);

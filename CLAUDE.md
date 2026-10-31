@@ -10,7 +10,7 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 ## Estado
 - Entregadas: Ejercitación 3.1 (HTML/CSS/JS) y 4.1 (React). Lighthouse 100 en Accessibility y Best practices en las 9 pantallas.
 - Hecho además: ventana de Ayuda, modo oscuro, categorías propias, 36 íconos para objetivos, íconos SVG de volver/cerrar, flujos de Figma (detalle de objetivos y movimientos, filtros).
-- **Backend en curso** (Ejercitación 5.1) en la rama `full-stack`: Node + Express en `backend/`, con lo visto en la unidad 5. Hechos los pasos 1 y 2 del plan: esqueleto y `GET /api/patrimonio`, que el frontend usa para la carga inicial (`src/utils/api.js`). Las escrituras siguen siendo locales y se pierden al recargar hasta migrar cada acción. `frontend/public/data/patrimonio.json` ya no se usa (se borra en la limpieza final). La autenticación sigue simulada.
+- **Backend en curso** (Ejercitación 5.1) en la rama `full-stack`: Node + Express en `backend/`, con lo visto en la unidad 5. Hechos los pasos 1, 2, 3 y 4A del plan: esqueleto, `GET /api/patrimonio` (el frontend lo usa para la carga inicial con `src/utils/api.js`), reglas en el backend con el campo `efecto` en cada movimiento, y el CRUD de `/api/movimientos` con filtros (todavía sin usar desde el frontend). Las escrituras siguen siendo locales y se pierden al recargar hasta migrar cada acción. `frontend/public/data/patrimonio.json` ya no se usa (se borra en la limpieza final). La autenticación sigue simulada.
 - No mergear `full-stack` a `main` sin decidir antes dónde se publica la API: Netlify no ejecuta Node. Además, al mergear hay que cambiar en Netlify el "Base directory" a `frontend`.
 - El README todavía tiene los comandos para correr la app desde la raíz: hay que actualizarlo (avisando antes al autor).
 - Lista de control oficial de la 5.1: (1) todos los endpoints responden con el código correcto, también en errores; (2) una ruta inexistente devuelve 404 en JSON; (3) los cambios desde la interfaz se guardan en el JSON y siguen al reiniciar el servidor; (4) el frontend toma la API de `VITE_API_URL`; (5) sin errores en la consola del navegador ni en la terminal del servidor; (6) siguiendo el README otra persona puede clonar y ejecutar ambas partes; (7) se puede recorrer el user flow completo con datos reales.
@@ -41,7 +41,9 @@ En la raíz solo están `CLAUDE.md`, `README.md`, `frontend/` y `backend/`. Las 
 - `docs/` — planificación y árbol de componentes (actualizar al agregar componentes, con `npm run arbol`).
 - `backend/src/index.js` — arma la app de Express: middlewares, rutas, 404 y errores.
 - `backend/src/routes/` (un `express.Router()` por recurso), `controllers/`, `middlewares/` (registro, noEncontrado, manejoErrores), `data/` (archivo JSON), y más adelante `reglas/` (`efectoMovimiento`), `validaciones/` y `servicios/`.
-- Errores de la API siempre en JSON: `{ "error": "mensaje en español" }`. Códigos: 200, 201, 204, 400, 404 y 500.
+- Errores de la API siempre en JSON: `{ "error": "mensaje en español" }`. Códigos: 200, 201, 204, 400, 404 y 500. Los controladores hacen `throw errorApi(400|404, mensaje)` (`servicios/errorApi.js`) y responde `middlewares/manejoErrores.js`; cualquier otro error es 500 sin detalles (el detalle va solo a la terminal).
+- Toda escritura pasa por `modificarDatos(cambiar)` (`servicios/datos.js`): lee, cambia y guarda una sola vez, en fila; si `cambiar` lanza un error, no se guarda nada.
+- Validaciones en `validaciones/`: devuelven `{ error }` o los valores limpios; solo se toman los campos conocidos (id y fecha los pone el servidor).
 
 ## Modelo financiero
 - Patrimonio = Disponible + Ahorros + Reserva de tarjeta.

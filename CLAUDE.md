@@ -10,14 +10,14 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 ## Estado
 - Entregadas: Ejercitación 3.1 (HTML/CSS/JS) y 4.1 (React). Lighthouse 100 en Accessibility y Best practices en las 9 pantallas.
 - Hecho además: ventana de Ayuda, modo oscuro, categorías propias, 36 íconos para objetivos, íconos SVG de volver/cerrar, flujos de Figma (detalle de objetivos y movimientos, filtros).
-- **Backend en curso** (Ejercitación 5.1) en la rama `full-stack`: Node + Express en `backend/`, con lo visto en la unidad 5. Ya está el esqueleto (paso 1 del plan); el frontend todavía lee `public/data/patrimonio.json` y los cambios se pierden al recargar hasta migrar cada parte. La autenticación sigue simulada.
-- No mergear `full-stack` a `main` sin decidir antes dónde se publica la API: Netlify no ejecuta Node.
+- **Backend en curso** (Ejercitación 5.1) en la rama `full-stack`: Node + Express en `backend/`, con lo visto en la unidad 5. Ya está el esqueleto (paso 1 del plan); el frontend todavía lee `frontend/public/data/patrimonio.json` y los cambios se pierden al recargar hasta migrar cada parte. La autenticación sigue simulada.
+- No mergear `full-stack` a `main` sin decidir antes dónde se publica la API: Netlify no ejecuta Node. Además, al mergear hay que cambiar en Netlify el "Base directory" a `frontend`.
+- El README todavía tiene los comandos para correr la app desde la raíz: hay que actualizarlo (avisando antes al autor).
 - Lista de control oficial de la 5.1: (1) todos los endpoints responden con el código correcto, también en errores; (2) una ruta inexistente devuelve 404 en JSON; (3) los cambios desde la interfaz se guardan en el JSON y siguen al reiniciar el servidor; (4) el frontend toma la API de `VITE_API_URL`; (5) sin errores en la consola del navegador ni en la terminal del servidor; (6) siguiendo el README otra persona puede clonar y ejecutar ambas partes; (7) se puede recorrer el user flow completo con datos reales.
 
 ## Comandos
-- `npm run dev` — servidor de desarrollo
-- `npm run build` — compila (debe pasar sin errores antes de cada commit)
-- `npm run lint` — oxlint (debe quedar sin errores; también revisa `backend/`)
+El repo tiene dos partes, cada una con su `package.json` y su `node_modules`: `frontend/` y `backend/`. Los comandos se corren dentro de cada carpeta (`cd frontend` o `cd backend`).
+- En `frontend/`: `npm run dev` (servidor de desarrollo), `npm run build` (debe pasar sin errores antes de cada commit), `npm run lint` (oxlint, debe quedar sin errores; revisa solo `frontend/`), `npm run arbol` (regenera `docs/arbol-de-componentes.svg`).
 - En `backend/`: `npm run dev` (con `node --watch`) o `npm start`. Puerto desde `process.env.PORT`, 3000 por defecto.
 
 ## Reglas del curso (no romperlas)
@@ -31,13 +31,14 @@ Proyecto final de **Programación 4** (Universidad Champagnat, prof. Ignacio G. 
 - El frontend toma la dirección de la API de `VITE_API_URL` (en `.env`), nunca escrita a mano.
 
 ## Estructura
+En la raíz solo están `CLAUDE.md`, `README.md`, `frontend/` y `backend/`. Las rutas `src/`, `public/`, `docs/` y `scripts/` de abajo son dentro de `frontend/`.
 - `src/App.jsx` — raíz: sesión, navegación, tema (clase `tema-oscuro` en un div envolvente).
 - `src/pages/` — Inicio, Movimientos, Ahorros, Tarjetas, Estadisticas, Configuracion, Login, CrearCuenta, Recuperar.
 - `src/components/` — PanelLateral (con Overlay), Modal, PanelObjetivo, PanelMovimiento, PanelAyuda, SelectorIcono, SelectorCategoria, FormularioMovimiento, Iconos (SVG), etc.
 - `src/hooks/usePatrimonio.js` — datos y reglas de negocio.
 - `src/utils/formato.js` — formato de montos/fechas, íconos y categorías predeterminadas. `validacion.js` — validaciones.
 - `src/index.css` — todos los estilos; colores en variables de `:root`, modo oscuro redefine las variables en `.tema-oscuro`. No usar colores fijos: crear/usar variables.
-- `docs/` — planificación y árbol de componentes (actualizar al agregar componentes).
+- `docs/` — planificación y árbol de componentes (actualizar al agregar componentes, con `npm run arbol`).
 - `backend/src/index.js` — arma la app de Express: middlewares, rutas, 404 y errores.
 - `backend/src/routes/` (un `express.Router()` por recurso), `controllers/`, `middlewares/` (registro, noEncontrado, manejoErrores), `data/` (archivo JSON), y más adelante `reglas/` (`efectoMovimiento`), `validaciones/` y `servicios/`.
 - Errores de la API siempre en JSON: `{ "error": "mensaje en español" }`. Códigos: 200, 201, 204, 400, 404 y 500.

@@ -1,7 +1,9 @@
 // ==========================================================================
 // generar-arbol.mjs - arma docs/arbol-de-componentes.svg leyendo el código.
 //
-// Cómo se usa:   npm run arbol
+// Cómo se usa:   npm run arbol   (desde la carpeta frontend/)
+// Las rutas se calculan desde la ubicación de este script, así que siempre
+// lee frontend/src y escribe en frontend/docs.
 //
 // Qué hace:
 //   1. Lee los import de App.jsx, src/pages y src/components para saber qué

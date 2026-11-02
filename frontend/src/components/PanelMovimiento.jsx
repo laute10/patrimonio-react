@@ -92,6 +92,14 @@ function PanelMovimiento({
 
   async function confirmarEliminar() {
     if (guardando) return;
+    // Control previo: eliminar un ingreso cuya plata ya se usó dejaría el
+    // disponible en negativo. Se avisa sin llamar a la API (que igual lo
+    // rechazaría con un 400).
+    if (movimiento.tipo === "ingreso" && disponible - movimiento.monto < 0) {
+      setAviso("No se puede eliminar: ese dinero ya fue utilizado y quedaría en negativo.");
+      setModalEliminar(false);
+      return;
+    }
     setGuardando(true);
     setAviso("");
     try {
@@ -132,6 +140,7 @@ function PanelMovimiento({
             categorias={movimiento.tipo === "ingreso" ? categoriasIngreso : categoriasGasto}
             onNuevaCategoria={movimiento.tipo === "ingreso" ? agregarCategoriaIngreso : agregarCategoria}
             maximo={movimiento.tipo === "gasto" ? disponible + movimiento.monto : undefined}
+            minimo={movimiento.tipo === "ingreso" ? movimiento.monto - disponible : undefined}
             inicial={{ categoria: movimiento.categoria, monto: movimiento.monto, descripcion: movimiento.descripcion }}
             onRegistrar={guardar}
           />

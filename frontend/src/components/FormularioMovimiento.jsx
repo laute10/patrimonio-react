@@ -6,10 +6,13 @@ import SelectorCategoria from "./SelectorCategoria";
 // FormularioMovimiento - formulario controlado para registrar un gasto o un
 // ingreso. Es el mismo componente para los dos: cambian por props las
 // categorías, el id y (para el gasto) el máximo que se puede gastar.
+// Al editar un ingreso puede recibir un mínimo: bajarlo de más dejaría el
+// disponible en negativo. Son controles previos para no mandar a la API
+// algo que va a rechazar; el que decide sigue siendo el servidor.
 // Cada campo muestra su propio mensaje de error.
 // ==========================================================================
 
-function FormularioMovimiento({ id, categorias, maximo, onRegistrar, inicial, onNuevaCategoria }) {
+function FormularioMovimiento({ id, categorias, maximo, minimo, onRegistrar, inicial, onNuevaCategoria }) {
   const [categoria, setCategoria] = useState(inicial ? inicial.categoria : categorias[0]);
   const [monto, setMonto] = useState(inicial ? String(inicial.monto) : "");
   const [descripcion, setDescripcion] = useState(inicial ? inicial.descripcion : "");
@@ -25,6 +28,10 @@ function FormularioMovimiento({ id, categorias, maximo, onRegistrar, inicial, on
     }
     if (maximo !== undefined && valor > maximo) {
       setErrorMonto("No tenés dinero disponible suficiente para este monto.");
+      return;
+    }
+    if (minimo !== undefined && valor < minimo) {
+      setErrorMonto("Ese cambio dejaría tu dinero disponible en negativo.");
       return;
     }
 

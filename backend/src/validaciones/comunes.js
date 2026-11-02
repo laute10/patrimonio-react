@@ -5,6 +5,7 @@
 // ==========================================================================
 
 const MAX_DESCRIPCION = 100; // el mismo límite que el frontend (maxLength)
+const MAX_CATEGORIA = 25; // el mismo límite que el selector de categorías
 
 export function esObjeto(valor) {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
@@ -25,6 +26,15 @@ export function errorMonto(monto, campo = "el monto") {
   // "500" (con comillas) es un texto, no un número.
   if (typeof monto !== "number" || !Number.isFinite(monto)) return `${Campo} tiene que ser un número.`;
   if (monto <= 0) return "Ingresá un monto mayor a cero.";
+  return "";
+}
+
+// Categoría de un gasto, un ingreso o un consumo de tarjeta.
+export function errorCategoria(categoria) {
+  if (categoria === undefined) return "Falta la categoría.";
+  if (typeof categoria !== "string") return "La categoría tiene que ser un texto.";
+  if (categoria.trim() === "") return "La categoría no puede estar vacía.";
+  if (categoria.trim().length > MAX_CATEGORIA) return `La categoría puede tener hasta ${MAX_CATEGORIA} caracteres.`;
   return "";
 }
 

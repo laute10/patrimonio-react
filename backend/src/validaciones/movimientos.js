@@ -8,11 +8,9 @@
 // otro campo, se ignora (esos los pone el servidor).
 // ==========================================================================
 
-import { esObjeto, validarId, errorMonto, errorDescripcion } from "./comunes.js";
+import { esObjeto, validarId, errorMonto, errorDescripcion, errorCategoria } from "./comunes.js";
 
 export { validarId };
-
-const MAX_CATEGORIA = 25; // el mismo límite que el frontend
 
 // Tipos que se pueden filtrar: la clase (como las pestañas de Movimientos)
 // o el tipo exacto.
@@ -20,16 +18,6 @@ const TIPOS_FILTRO = [
   "ingreso", "gasto", "ahorro", "tarjeta",
   "ahorro-agregado", "ahorro-retirado", "ahorro-usado", "tarjeta-consumo", "tarjeta-pago",
 ];
-
-// ---- Campos sueltos (devuelven "" si está bien, o el mensaje) -------------
-
-function errorCategoria(categoria) {
-  if (categoria === undefined) return "Falta la categoría.";
-  if (typeof categoria !== "string") return "La categoría tiene que ser un texto.";
-  if (categoria.trim() === "") return "La categoría no puede estar vacía.";
-  if (categoria.trim().length > MAX_CATEGORIA) return `La categoría puede tener hasta ${MAX_CATEGORIA} caracteres.`;
-  return "";
-}
 
 // Categoría, monto y descripción: lo común de POST y PUT.
 function validarCampos(cuerpo) {

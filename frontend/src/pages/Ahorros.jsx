@@ -70,6 +70,15 @@ function Ahorros({
     setPanelAbierto(null);
   }
 
+  // objetivoElegido se inicializa una sola vez, al entrar a la pantalla: si
+  // en ese momento no había objetivos (o el elegido se eliminó después), al
+  // abrir el panel se elige el primero que haya.
+  function abrirAgregarAhorro() {
+    const sigueExistiendo = objetivos.some((obj) => String(obj.id) === String(objetivoElegido));
+    if (!sigueExistiendo) setObjetivoElegido(objetivos[0]?.id ?? "");
+    setPanelAbierto("agregar");
+  }
+
   async function manejarCrearObjetivo(evento) {
     evento.preventDefault();
     if (guardando) return;
@@ -255,7 +264,7 @@ function Ahorros({
           <button type="button" className="btn btn--secundario" onClick={() => setPanelAbierto("crear")}>
             + Crear objetivo
           </button>
-          <button type="button" className="btn btn--primario" onClick={() => setPanelAbierto("agregar")}>
+          <button type="button" className="btn btn--primario" onClick={abrirAgregarAhorro}>
             + Agregar ahorro
           </button>
         </div>

@@ -56,11 +56,17 @@ function siguienteMes(periodo) {
     : { mes: periodo.mes + 1, anio: periodo.anio };
 }
 
+// La API manda la fecha como texto ISO; la app trabaja con Date.
+function desdeApi(mov) {
+  return { ...mov, fecha: new Date(mov.fecha) };
+}
+
 function usePatrimonio() {
   // El estado inicial se pide a la API (GET /patrimonio) con fetch dentro
   // de un useEffect, a través de pedir() (utils/api.js).
-  // Por ahora los cambios siguen siendo locales: se pierden al recargar
-  // hasta que cada acción pase a usar la API.
+  // Los ingresos y gastos ya se guardan en la API; los ahorros y las
+  // tarjetas siguen siendo locales (se pierden al recargar) hasta que
+  // pasen a usarla.
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [intento, setIntento] = useState(0); // al cambiar, se vuelve a pedir
@@ -85,8 +91,7 @@ function usePatrimonio() {
           }))
         );
         setTarjetas(datos.tarjetas);
-        // La API manda la fecha como texto ISO; la app trabaja con Date.
-        setMovimientos(datos.movimientos.map((mov) => ({ ...mov, fecha: new Date(mov.fecha) })));
+        setMovimientos(datos.movimientos.map(desdeApi));
         setCategoriasPropias(datos.categoriasPropias.gasto);
         setCategoriasIngresoPropias(datos.categoriasPropias.ingreso);
         setCargando(false);
@@ -127,20 +132,27 @@ function usePatrimonio() {
     setMovimientos((anteriores) => [nuevo, ...anteriores]);
   }
 
-  // -- Ingresos y gastos (sección 11-12) ----------------------------------
+  // -- Ingresos y gastos (sección 11-12): se guardan en la API ------------
+  // Son async: el estado cambia recién cuando la API responde bien, con el
+  // "efecto" que calculó el servidor (el frontend no repite las reglas).
+  // Si la API responde un error o no responde, pedir() lanza un Error con
+  // el mensaje para el usuario y el estado queda como estaba.
 
-  function registrarIngreso({ categoria, monto, descripcion }) {
-    const datos = { tipo: "ingreso", categoria, descripcion, monto, signo: "+" };
-    const efecto = efectoMovimiento(datos);
-    setDisponible((actual) => actual + efecto.disponible);
-    agregarMovimiento(datos);
+  async function registrarMovimiento(tipo, { categoria, monto, descripcion }) {
+    const nuevo = await pedir("/movimientos", {
+      metodo: "POST",
+      cuerpo: { tipo, categoria, monto, descripcion },
+    });
+    setDisponible((actual) => actual + nuevo.efecto.disponible);
+    setMovimientos((anteriores) => [desdeApi(nuevo), ...anteriores]);
   }
 
-  function registrarGasto({ categoria, monto, descripcion }) {
-    const datos = { tipo: "gasto", categoria, descripcion, monto, signo: "-" };
-    const efecto = efectoMovimiento(datos);
-    setDisponible((actual) => actual + efecto.disponible);
-    agregarMovimiento(datos);
+  function registrarIngreso(datos) {
+    return registrarMovimiento("ingreso", datos);
+  }
+
+  function registrarGasto(datos) {
+    return registrarMovimiento("gasto", datos);
   }
 
   // -- Ahorros y objetivos (sección 13-16) --------------------------------
@@ -234,38 +246,31 @@ function usePatrimonio() {
     return true;
   }
 
-  // -- Editar / eliminar ingresos y gastos --------------------------------
+  // -- Editar / eliminar ingresos y gastos: también en la API -------------
   // Solo los movimientos de tipo ingreso y gasto se gestionan desde
   // Movimientos; los de ahorros y tarjetas se gestionan desde su pantalla.
-  // Devuelven true si se pudo, false si el cambio dejaría el dinero
-  // disponible en negativo.
+  // Las reglas (tipo editable, disponible no negativo) las controla el
+  // servidor: si no se cumplen responde 400 y pedir() lanza su mensaje.
 
-  function editarMovimiento({ id, categoria, monto, descripcion }) {
-    const mov = movimientos.find((m) => m.id === id);
-    if (!mov || (mov.tipo !== "ingreso" && mov.tipo !== "gasto")) return false;
-
-    // Lo que cambia el disponible es el efecto nuevo menos el que tenía.
-    const impacto = efectoMovimiento({ ...mov, monto }).disponible - efectoMovimiento(mov).disponible;
-    if (disponible + impacto < 0) return false;
-
-    setDisponible((actual) => actual + impacto);
-    setMovimientos((anteriores) =>
-      anteriores.map((m) => (m.id === id ? { ...m, categoria, monto, descripcion } : m))
-    );
-    return true;
+  async function editarMovimiento({ id, categoria, monto, descripcion }) {
+    const anterior = movimientos.find((m) => m.id === id);
+    const actualizado = await pedir(`/movimientos/${id}`, {
+      metodo: "PUT",
+      cuerpo: { categoria, monto, descripcion },
+    });
+    // Lo que cambia el disponible es el efecto nuevo menos el que tenía
+    // (los dos los calculó el servidor).
+    setDisponible((actual) => actual + actualizado.efecto.disponible - anterior.efecto.disponible);
+    setMovimientos((anteriores) => anteriores.map((m) => (m.id === id ? desdeApi(actualizado) : m)));
   }
 
-  function eliminarMovimiento(id) {
-    const mov = movimientos.find((m) => m.id === id);
-    if (!mov || (mov.tipo !== "ingreso" && mov.tipo !== "gasto")) return false;
-
-    // Eliminar deshace el efecto del movimiento.
-    const impacto = -efectoMovimiento(mov).disponible;
-    if (disponible + impacto < 0) return false;
-
-    setDisponible((actual) => actual + impacto);
+  async function eliminarMovimiento(id) {
+    const eliminado = movimientos.find((m) => m.id === id);
+    // La API responde 204 (sin cuerpo): para deshacer el movimiento se usa
+    // el efecto que ya había mandado el servidor al leerlo.
+    await pedir(`/movimientos/${id}`, { metodo: "DELETE" });
+    setDisponible((actual) => actual - eliminado.efecto.disponible);
     setMovimientos((anteriores) => anteriores.filter((m) => m.id !== id));
-    return true;
   }
 
   // -- Tarjetas y períodos (sección 17-26) --------------------------------

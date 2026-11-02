@@ -70,6 +70,7 @@ function FormularioMovimiento({ id, categorias, maximo, onRegistrar, inicial, on
         id={id + "-descripcion"}
         etiqueta="Descripción (opcional)"
         placeholder="Ej. Compra semanal"
+        maxLength={100}
         valor={descripcion}
         onCambio={setDescripcion}
       />

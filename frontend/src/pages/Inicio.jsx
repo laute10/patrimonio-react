@@ -33,9 +33,15 @@ function Inicio({
   // formulario, React lo vuelve a crear vacío y sin errores viejos.
   const [version, setVersion] = useState(0);
   const [aviso, setAviso] = useState("");
+  // Mientras se espera la respuesta de la API el botón queda deshabilitado
+  // (así un doble clic no registra dos veces); si la API responde un error,
+  // se muestra dentro del panel.
+  const [guardando, setGuardando] = useState(false);
+  const [errorPanel, setErrorPanel] = useState("");
 
   function abrirPanel(tipo) {
     setVersion(version + 1);
+    setErrorPanel("");
     setPanelAbierto(tipo);
   }
 
@@ -43,16 +49,29 @@ function Inicio({
     setPanelAbierto(null);
   }
 
+  // registrar es registrarGasto o registrarIngreso (del hook, async).
+  // El aviso de éxito aparece solo si la API respondió bien.
+  async function manejarRegistro(registrar, textoAviso, datos) {
+    if (guardando) return;
+    setGuardando(true);
+    setErrorPanel("");
+    try {
+      await registrar(datos);
+      setAviso(textoAviso + formatearMonto(datos.monto));
+      cerrarPanel();
+    } catch (error) {
+      setErrorPanel(error.message);
+    } finally {
+      setGuardando(false);
+    }
+  }
+
   function manejarGasto(datos) {
-    registrarGasto(datos);
-    setAviso("Gasto registrado: " + formatearMonto(datos.monto));
-    cerrarPanel();
+    return manejarRegistro(registrarGasto, "Gasto registrado: ", datos);
   }
 
   function manejarIngreso(datos) {
-    registrarIngreso(datos);
-    setAviso("Ingreso registrado: " + formatearMonto(datos.monto));
-    cerrarPanel();
+    return manejarRegistro(registrarIngreso, "Ingreso registrado: ", datos);
   }
 
   return (
@@ -125,7 +144,9 @@ function Inicio({
         onCerrar={cerrarPanel}
         acciones={
           <>
-            <button type="submit" form="form-gasto" className="btn btn--primario">Registrar gasto</button>
+            <button type="submit" form="form-gasto" className="btn btn--primario" disabled={guardando}>
+              {guardando ? "Guardando…" : "Registrar gasto"}
+            </button>
             <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarPanel}>Cancelar</button>
           </>
         }
@@ -138,6 +159,7 @@ function Inicio({
           maximo={disponible}
           onRegistrar={manejarGasto}
         />
+        {errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
       </PanelLateral>
 
       <PanelLateral
@@ -147,7 +169,9 @@ function Inicio({
         onCerrar={cerrarPanel}
         acciones={
           <>
-            <button type="submit" form="form-ingreso" className="btn btn--primario">Registrar ingreso</button>
+            <button type="submit" form="form-ingreso" className="btn btn--primario" disabled={guardando}>
+              {guardando ? "Guardando…" : "Registrar ingreso"}
+            </button>
             <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarPanel}>Cancelar</button>
           </>
         }
@@ -159,6 +183,7 @@ function Inicio({
           onNuevaCategoria={agregarCategoriaIngreso}
           onRegistrar={manejarIngreso}
         />
+        {errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
       </PanelLateral>
     </main>
   );

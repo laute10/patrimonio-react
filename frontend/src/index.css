@@ -285,6 +285,14 @@ button {
   background-color: var(--color-fondo);
 }
 
+/* Mientras se espera la respuesta de la API ("Guardando…"). Sin
+   pointer-events no hay hover ni clic; el atributo disabled ya lo
+   anuncia a los lectores de pantalla. */
+.btn:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 /* ==========================================================================
    ÚLTIMOS MOVIMIENTOS
    ========================================================================== */

@@ -58,6 +58,8 @@ function PanelMovimiento({
   const [vista, setVista] = useState("detalle");
   const [modalEliminar, setModalEliminar] = useState(false);
   const [aviso, setAviso] = useState("");
+  // true mientras se espera la respuesta de la API (botones deshabilitados).
+  const [guardando, setGuardando] = useState(false);
 
   const clase = clasificar(movimiento.tipo);
   const editable = movimiento.tipo === "ingreso" || movimiento.tipo === "gasto";
@@ -71,24 +73,36 @@ function PanelMovimiento({
     tarjeta: "Compra con tarjeta",
   }[clase];
 
-  function guardar(datos) {
-    const ok = editarMovimiento({ id: movimiento.id, ...datos });
-    if (!ok) {
-      setAviso("Ese cambio dejaría tu dinero disponible en negativo.");
-      return;
-    }
+  // editarMovimiento y eliminarMovimiento (del hook) son async: si la API
+  // responde un error, lanzan su mensaje (por ejemplo, que el cambio dejaría
+  // el disponible en negativo) y se muestra en el aviso.
+  async function guardar(datos) {
+    if (guardando) return;
+    setGuardando(true);
     setAviso("");
-    setVista("detalle");
+    try {
+      await editarMovimiento({ id: movimiento.id, ...datos });
+      setVista("detalle");
+    } catch (error) {
+      setAviso(error.message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
-  function confirmarEliminar() {
-    const ok = eliminarMovimiento(movimiento.id);
-    if (!ok) {
-      setAviso("No se puede eliminar: ese dinero ya fue utilizado y quedaría en negativo.");
+  async function confirmarEliminar() {
+    if (guardando) return;
+    setGuardando(true);
+    setAviso("");
+    try {
+      await eliminarMovimiento(movimiento.id);
+      onCerrar();
+    } catch (error) {
+      setAviso(error.message);
       setModalEliminar(false);
-      return;
+    } finally {
+      setGuardando(false);
     }
-    onCerrar();
   }
 
   const textoTipo = movimiento.tipo === "ingreso" ? "ingreso" : "gasto";
@@ -106,7 +120,9 @@ function PanelMovimiento({
           onVolver={() => { setAviso(""); setVista("detalle"); }}
           acciones={
             <Fragment key="editar">
-              <button type="submit" form="form-editar-movimiento" className="btn btn--primario">Guardar cambios</button>
+              <button type="submit" form="form-editar-movimiento" className="btn btn--primario" disabled={guardando}>
+                {guardando ? "Guardando…" : "Guardar cambios"}
+              </button>
               <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setVista("detalle")}>Cancelar</button>
             </Fragment>
           }
@@ -217,8 +233,10 @@ function PanelMovimiento({
             <span>{signo}{formatearMonto(movimiento.monto)}</span>
           </div>
           <div className="modal__acciones">
-            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setModalEliminar(false)}>Cancelar</button>
-            <button type="button" className="btn btn--destructivo" onClick={confirmarEliminar}>Eliminar</button>
+            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setModalEliminar(false)} disabled={guardando}>Cancelar</button>
+            <button type="button" className="btn btn--destructivo" onClick={confirmarEliminar} disabled={guardando}>
+              {guardando ? "Guardando…" : "Eliminar"}
+            </button>
           </div>
         </Modal>
       )}

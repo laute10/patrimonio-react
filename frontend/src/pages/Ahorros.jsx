@@ -59,12 +59,20 @@ function Ahorros({
   const [errorMontoObjetivo, setErrorMontoObjetivo] = useState("");
   const [errorMontoAhorro, setErrorMontoAhorro] = useState("");
 
+  // Mientras se espera la respuesta de la API el botón queda deshabilitado
+  // con "Guardando…"; si la API responde un error, se muestra en el modal o
+  // el panel abierto.
+  const [guardando, setGuardando] = useState(false);
+  const [errorPanel, setErrorPanel] = useState("");
+
   function cerrarPanel() {
+    setErrorPanel("");
     setPanelAbierto(null);
   }
 
-  function manejarCrearObjetivo(evento) {
+  async function manejarCrearObjetivo(evento) {
     evento.preventDefault();
+    if (guardando) return;
 
     const mensajeNombre = nombreObjetivo.trim() === "" ? "Ingresá el nombre del objetivo." : "";
     const mensajeMonto = Number(montoObjetivo) <= 0 ? "Ingresá un monto mayor a cero." : "";
@@ -72,18 +80,24 @@ function Ahorros({
     setErrorMontoObjetivo(mensajeMonto);
     if (mensajeNombre !== "" || mensajeMonto !== "") return;
 
-    crearObjetivo({ nombre: nombreObjetivo.trim(), montoObjetivo: Number(montoObjetivo), icono: iconoObjetivo });
-
-    setNombreObjetivo("");
-    setMontoObjetivo("");
-    setIconoObjetivo(ICONOS[0]);
-    setErrorNombre("");
-    setErrorMontoObjetivo("");
-    cerrarPanel();
+    setGuardando(true);
+    setErrorPanel("");
+    try {
+      await crearObjetivo({ nombre: nombreObjetivo.trim(), montoObjetivo: Number(montoObjetivo), icono: iconoObjetivo });
+      setNombreObjetivo("");
+      setMontoObjetivo("");
+      setIconoObjetivo(ICONOS[0]);
+      cerrarPanel();
+    } catch (error) {
+      setErrorPanel(error.message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
-  function manejarAgregarAhorro(evento) {
+  async function manejarAgregarAhorro(evento) {
     evento.preventDefault();
+    if (guardando) return;
 
     if (montoAhorro === "" || Number(montoAhorro) <= 0) {
       setErrorMontoAhorro("Ingresá un monto mayor a cero.");
@@ -95,16 +109,22 @@ function Ahorros({
       return;
     }
 
-    agregarAhorro({
-      objetivoId: Number(objetivoElegido),
-      monto: Number(montoAhorro),
-      descripcion: descripcionAhorro,
-    });
-
-    setMontoAhorro("");
-    setDescripcionAhorro("");
-    setErrorMontoAhorro("");
-    cerrarPanel();
+    setGuardando(true);
+    setErrorPanel("");
+    try {
+      await agregarAhorro({
+        objetivoId: Number(objetivoElegido),
+        monto: Number(montoAhorro),
+        descripcion: descripcionAhorro.trim(),
+      });
+      setMontoAhorro("");
+      setDescripcionAhorro("");
+      cerrarPanel();
+    } catch (error) {
+      setErrorPanel(error.message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
   const totalObjetivo = objetivos.reduce((suma, obj) => suma + obj.montoObjetivo, 0);
@@ -123,6 +143,7 @@ function Ahorros({
           id="objetivo-nombre"
           etiqueta="Nombre del objetivo"
           placeholder="Ej. Viaje a Brasil"
+          maxLength={40}
           valor={nombreObjetivo}
           onCambio={(nuevo) => {
             setNombreObjetivo(nuevo);
@@ -145,9 +166,12 @@ function Ahorros({
           error={errorMontoObjetivo}
         />
         <SelectorIcono valor={iconoObjetivo} onCambio={setIconoObjetivo} />
+        {errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
         <div className="modal__acciones modal__acciones--separadas">
           <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarPanel}>Cancelar</button>
-          <button type="submit" className="btn btn--primario">Crear objetivo</button>
+          <button type="submit" className="btn btn--primario" disabled={guardando}>
+            {guardando ? "Guardando…" : "Crear objetivo"}
+          </button>
         </div>
       </form>
     </Modal>
@@ -341,7 +365,9 @@ function Ahorros({
         onCerrar={cerrarPanel}
         acciones={
           <>
-            <button type="submit" form="form-agregar-ahorro" className="btn btn--primario">Agregar ahorro</button>
+            <button type="submit" form="form-agregar-ahorro" className="btn btn--primario" disabled={guardando}>
+              {guardando ? "Guardando…" : "Agregar ahorro"}
+            </button>
             <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarPanel}>Cancelar</button>
           </>
         }
@@ -375,10 +401,12 @@ function Ahorros({
             id="ahorro-descripcion"
             etiqueta="Descripción (opcional)"
             placeholder="Ej. Parte de mi sueldo mensual"
+            maxLength={100}
             valor={descripcionAhorro}
             onCambio={setDescripcionAhorro}
           />
         </form>
+        {errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
       </PanelLateral>
     </main>
   );

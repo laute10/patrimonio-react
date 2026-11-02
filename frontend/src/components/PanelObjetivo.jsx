@@ -15,7 +15,9 @@ import { formatearMonto } from "../utils/formato";
 //   - vista: "detalle" | "agregar" | "retirar" | "utilizar" | "editar"
 //   - modal: null | "usar" | "eliminar" | "no-eliminar"
 //   - menuAbierto: el menú de los tres puntos
-// El objetivo y las acciones llegan por props desde usePatrimonio.
+//   - guardando / aviso: espera de la API y su mensaje de error
+// El objetivo y las acciones llegan por props desde usePatrimonio; las
+// acciones son async y, si la API responde un error, lanzan su mensaje.
 // ==========================================================================
 
 const TEXTOS_MONTO = {
@@ -49,6 +51,9 @@ function PanelObjetivo({
   const [errorNombre, setErrorNombre] = useState("");
   const [errorMontoObjetivo, setErrorMontoObjetivo] = useState("");
 
+  const [guardando, setGuardando] = useState(false);
+  const [aviso, setAviso] = useState("");
+
   const porcentajeReal = Math.round((objetivo.montoActual / objetivo.montoObjetivo) * 100);
   const porcentajeBarra = Math.min(100, porcentajeReal);
   const cumplido = objetivo.montoActual >= objetivo.montoObjetivo;
@@ -57,6 +62,7 @@ function PanelObjetivo({
     setMonto("");
     setDescripcion("");
     setErrorMonto("");
+    setAviso("");
     setMenuAbierto(false);
     if (nuevaVista === "editar") {
       setNombre(objetivo.nombre);
@@ -89,6 +95,23 @@ function PanelObjetivo({
     return valor;
   }
 
+  // Llama a la API con "accion" y, si sale bien, ejecuta "despues". Si la
+  // API responde un error, queda en el aviso y la vista no cambia.
+  async function guardarConApi(accion, despues) {
+    if (guardando) return;
+    setGuardando(true);
+    setAviso("");
+    try {
+      await accion();
+      despues();
+    } catch (error) {
+      setAviso(error.message);
+      setModal(null);
+    } finally {
+      setGuardando(false);
+    }
+  }
+
   function manejarMovimiento(evento) {
     evento.preventDefault();
     const valor = validarMonto();
@@ -99,15 +122,16 @@ function PanelObjetivo({
       return;
     }
     const datos = { objetivoId: objetivo.id, monto: valor, descripcion: descripcion.trim() };
-    if (vista === "agregar") agregarAhorro(datos);
-    else retirarAhorro(datos);
-    irA("detalle");
+    const mover = vista === "agregar" ? agregarAhorro : retirarAhorro;
+    guardarConApi(() => mover(datos), () => irA("detalle"));
   }
 
   function confirmarUso() {
-    usarAhorro({ objetivoId: objetivo.id, monto: Number(monto), descripcion: descripcion.trim() });
-    setModal(null);
-    irA("detalle");
+    const datos = { objetivoId: objetivo.id, monto: Number(monto), descripcion: descripcion.trim() };
+    guardarConApi(() => usarAhorro(datos), () => {
+      setModal(null);
+      irA("detalle");
+    });
   }
 
   function manejarEdicion(evento) {
@@ -118,20 +142,20 @@ function PanelObjetivo({
     setErrorMontoObjetivo(mensajeMonto);
     if (mensajeNombre !== "" || mensajeMonto !== "") return;
 
-    editarObjetivo({ objetivoId: objetivo.id, nombre: nombre.trim(), montoObjetivo: Number(montoObjetivo), icono });
-    irA("detalle");
+    const datos = { objetivoId: objetivo.id, nombre: nombre.trim(), montoObjetivo: Number(montoObjetivo), icono };
+    guardarConApi(() => editarObjetivo(datos), () => irA("detalle"));
   }
 
   function pedirEliminar() {
     setMenuAbierto(false);
-    // Regla: no se puede eliminar un objetivo que todavía tiene dinero.
+    setAviso("");
+    // Regla: no se puede eliminar un objetivo que todavía tiene dinero
+    // (control previo: el servidor también lo rechaza).
     setModal(objetivo.montoActual > 0 ? "no-eliminar" : "eliminar");
   }
 
   function confirmarEliminar() {
-    eliminarObjetivo(objetivo.id);
-    setModal(null);
-    onCerrar();
+    guardarConApi(() => eliminarObjetivo(objetivo.id), onCerrar);
   }
 
   const botonesVolver = vista !== "detalle" ? () => irA("detalle") : undefined;
@@ -183,6 +207,7 @@ function PanelObjetivo({
         <CampoFormulario
           id="editar-objetivo-nombre"
           etiqueta="Nombre del objetivo"
+          maxLength={40}
           valor={nombre}
           onCambio={(nuevo) => { setNombre(nuevo); setErrorNombre(""); }}
           error={errorNombre}
@@ -202,7 +227,9 @@ function PanelObjetivo({
     );
     acciones = (
       <Fragment key={vista}>
-        <button type="submit" form="form-editar-objetivo" className="btn btn--primario">Guardar cambios</button>
+        <button type="submit" form="form-editar-objetivo" className="btn btn--primario" disabled={guardando}>
+          {guardando ? "Guardando…" : "Guardar cambios"}
+        </button>
         <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => irA("detalle")}>Cancelar</button>
       </Fragment>
     );
@@ -236,6 +263,7 @@ function PanelObjetivo({
           id="objetivo-descripcion-mov"
           etiqueta="Descripción (opcional)"
           placeholder="Ej. Ahorro del sueldo"
+          maxLength={100}
           valor={descripcion}
           onCambio={setDescripcion}
         />
@@ -243,7 +271,9 @@ function PanelObjetivo({
     );
     acciones = (
       <Fragment key={vista}>
-        <button type="submit" form="form-monto-objetivo" className="btn btn--primario">{textos.titulo}</button>
+        <button type="submit" form="form-monto-objetivo" className="btn btn--primario" disabled={guardando}>
+          {guardando ? "Guardando…" : textos.titulo}
+        </button>
         <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => irA("detalle")}>Cancelar</button>
       </Fragment>
     );
@@ -288,6 +318,7 @@ function PanelObjetivo({
         acciones={acciones}
       >
         {contenido}
+        {aviso !== "" && <p className="campo__error" role="alert">{aviso}</p>}
       </PanelLateral>
 
       {modal === "usar" && (
@@ -301,8 +332,10 @@ function PanelObjetivo({
             <span>Monto utilizado: <b>{formatearMonto(Number(monto))}</b></span>
           </div>
           <div className="modal__acciones">
-            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setModal(null)}>Cancelar</button>
-            <button type="button" className="btn btn--primario" onClick={confirmarUso}>Confirmar gasto</button>
+            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setModal(null)} disabled={guardando}>Cancelar</button>
+            <button type="button" className="btn btn--primario" onClick={confirmarUso} disabled={guardando}>
+              {guardando ? "Guardando…" : "Confirmar gasto"}
+            </button>
           </div>
         </Modal>
       )}
@@ -311,8 +344,10 @@ function PanelObjetivo({
         <Modal titulo="¿Eliminar objetivo?" onCerrar={() => setModal(null)}>
           <p className="modal__texto">Vas a eliminar el objetivo {objetivo.nombre}. Esta acción no se puede deshacer.</p>
           <div className="modal__acciones">
-            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setModal(null)}>Cancelar</button>
-            <button type="button" className="btn btn--destructivo" onClick={confirmarEliminar}>Eliminar</button>
+            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={() => setModal(null)} disabled={guardando}>Cancelar</button>
+            <button type="button" className="btn btn--destructivo" onClick={confirmarEliminar} disabled={guardando}>
+              {guardando ? "Guardando…" : "Eliminar"}
+            </button>
           </div>
         </Modal>
       )}

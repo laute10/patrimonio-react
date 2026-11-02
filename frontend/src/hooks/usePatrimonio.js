@@ -64,7 +64,7 @@ function desdeApi(mov) {
 function usePatrimonio() {
   // El estado inicial se pide a la API (GET /patrimonio) con fetch dentro
   // de un useEffect, a través de pedir() (utils/api.js).
-  // Los ingresos y gastos ya se guardan en la API; los ahorros y las
+  // Los ingresos, los gastos y los ahorros ya se guardan en la API; las
   // tarjetas siguen siendo locales (se pierden al recargar) hasta que
   // pasen a usarla.
   const [cargando, setCargando] = useState(true);
@@ -155,95 +155,61 @@ function usePatrimonio() {
     return registrarMovimiento("gasto", datos);
   }
 
-  // -- Ahorros y objetivos (sección 13-16) --------------------------------
+  // -- Ahorros y objetivos (sección 13-16): se guardan en la API ----------
+  // Mismo esquema que ingresos y gastos: async, y el estado cambia recién
+  // cuando la API responde bien. Las reglas (no superar el disponible ni lo
+  // ahorrado, no eliminar un objetivo con dinero) las controla el servidor.
 
-  function crearObjetivo({ nombre, montoObjetivo, icono }) {
-    setObjetivos((anteriores) => [
-      ...anteriores,
-      {
-        id: nuevoId(),
-        nombre,
-        montoObjetivo: Number(montoObjetivo),
-        montoActual: 0,
-        icono: icono || ICONOS[anteriores.length % ICONOS.length],
-      },
-    ]);
+  async function crearObjetivo({ nombre, montoObjetivo, icono }) {
+    const nuevo = await pedir("/objetivos", { metodo: "POST", cuerpo: { nombre, montoObjetivo, icono } });
+    setObjetivos((anteriores) => [...anteriores, nuevo]);
   }
 
-  // Editar nombre, monto objetivo e ícono. El nombre nuevo también se
-  // actualiza en los movimientos del objetivo para que el historial coincida.
-  function editarObjetivo({ objetivoId, nombre, montoObjetivo, icono }) {
-    setObjetivos((anteriores) =>
-      anteriores.map((obj) =>
-        obj.id === objetivoId ? { ...obj, nombre, montoObjetivo: Number(montoObjetivo), icono } : obj
-      )
-    );
+  // Editar nombre, monto objetivo e ícono. El servidor también renombra los
+  // movimientos del objetivo; acá se hace lo mismo con los que ya están en
+  // pantalla para que el historial coincida sin volver a pedirlos.
+  async function editarObjetivo({ objetivoId, nombre, montoObjetivo, icono }) {
+    const actualizado = await pedir(`/objetivos/${objetivoId}`, {
+      metodo: "PUT",
+      cuerpo: { nombre, montoObjetivo, icono },
+    });
+    setObjetivos((anteriores) => anteriores.map((obj) => (obj.id === objetivoId ? actualizado : obj)));
     setMovimientos((anteriores) =>
-      anteriores.map((mov) => (mov.objetivoId === objetivoId ? { ...mov, categoria: nombre } : mov))
+      anteriores.map((mov) => (mov.objetivoId === objetivoId ? { ...mov, categoria: actualizado.nombre } : mov))
     );
   }
 
-  // Agregar, retirar y usar ahorro comparten el mismo camino: el efecto del
-  // movimiento dice cuánto cambian el disponible y el objetivo.
-  function moverAhorro(datos) {
-    const efecto = efectoMovimiento(datos);
-    setDisponible((actual) => actual + efecto.disponible);
-    setObjetivos((anteriores) =>
-      anteriores.map((obj) =>
-        obj.id === datos.objetivoId ? { ...obj, montoActual: obj.montoActual + efecto.ahorros } : obj
-      )
-    );
-    agregarMovimiento(datos);
-  }
-
-  function nombreObjetivo(objetivoId) {
-    const objetivo = objetivos.find((obj) => obj.id === objetivoId);
-    return objetivo ? objetivo.nombre : "";
-  }
-
-  function agregarAhorro({ objetivoId, monto, descripcion }) {
-    moverAhorro({
-      tipo: "ahorro-agregado",
-      categoria: nombreObjetivo(objetivoId),
-      objetivoId,
-      descripcion,
-      monto,
-      signo: null, // transferencia interna: no suma ni resta al patrimonio
+  // Agregar, retirar y usar ahorro comparten el mismo camino. La API
+  // responde el movimiento (con su efecto) y el objetivo ya actualizado.
+  // Agregar y retirar son transferencias internas; usar SÍ es un gasto real
+  // (el patrimonio baja, sección 6 del documento).
+  async function moverAhorro(accion, { objetivoId, monto, descripcion }) {
+    const { movimiento, objetivo } = await pedir(`/objetivos/${objetivoId}/movimientos`, {
+      metodo: "POST",
+      cuerpo: { accion, monto, descripcion },
     });
+    setDisponible((actual) => actual + movimiento.efecto.disponible);
+    setObjetivos((anteriores) => anteriores.map((obj) => (obj.id === objetivoId ? objetivo : obj)));
+    setMovimientos((anteriores) => [desdeApi(movimiento), ...anteriores]);
   }
 
-  function retirarAhorro({ objetivoId, monto, descripcion }) {
-    moverAhorro({
-      tipo: "ahorro-retirado",
-      categoria: nombreObjetivo(objetivoId),
-      objetivoId,
-      descripcion,
-      monto,
-      signo: null,
-    });
+  function agregarAhorro(datos) {
+    return moverAhorro("agregar", datos);
   }
 
-  function usarAhorro({ objetivoId, monto, descripcion }) {
-    // A diferencia de agregar/retirar, usar el ahorro para comprar algo
-    // SÍ es un gasto real: el Patrimonio baja (sección 6 del documento).
-    moverAhorro({
-      tipo: "ahorro-usado",
-      categoria: nombreObjetivo(objetivoId),
-      objetivoId,
-      descripcion,
-      monto,
-      signo: "-",
-    });
+  function retirarAhorro(datos) {
+    return moverAhorro("retirar", datos);
   }
 
-  function eliminarObjetivo(objetivoId) {
-    const objetivo = objetivos.find((obj) => obj.id === objetivoId);
-    if (!objetivo || objetivo.montoActual > 0) {
-      // Regla sección 16: no se puede eliminar si todavía tiene dinero.
-      return false;
-    }
+  function usarAhorro(datos) {
+    return moverAhorro("usar", datos);
+  }
+
+  // Regla sección 16: no se puede eliminar si todavía tiene dinero. La
+  // pantalla ya lo avisa antes; si igual llega, el servidor responde 400.
+  async function eliminarObjetivo(objetivoId) {
+    await pedir(`/objetivos/${objetivoId}`, { metodo: "DELETE" });
     setObjetivos((anteriores) => anteriores.filter((obj) => obj.id !== objetivoId));
-    return true;
   }
 
   // -- Editar / eliminar ingresos y gastos: también en la API -------------

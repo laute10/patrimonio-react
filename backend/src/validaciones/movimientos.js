@@ -8,8 +8,11 @@
 // otro campo, se ignora (esos los pone el servidor).
 // ==========================================================================
 
+import { esObjeto, validarId, errorMonto, errorDescripcion } from "./comunes.js";
+
+export { validarId };
+
 const MAX_CATEGORIA = 25; // el mismo límite que el frontend
-const MAX_DESCRIPCION = 100;
 
 // Tipos que se pueden filtrar: la clase (como las pestañas de Movimientos)
 // o el tipo exacto.
@@ -18,10 +21,6 @@ const TIPOS_FILTRO = [
   "ahorro-agregado", "ahorro-retirado", "ahorro-usado", "tarjeta-consumo", "tarjeta-pago",
 ];
 
-function esObjeto(valor) {
-  return typeof valor === "object" && valor !== null && !Array.isArray(valor);
-}
-
 // ---- Campos sueltos (devuelven "" si está bien, o el mensaje) -------------
 
 function errorCategoria(categoria) {
@@ -29,22 +28,6 @@ function errorCategoria(categoria) {
   if (typeof categoria !== "string") return "La categoría tiene que ser un texto.";
   if (categoria.trim() === "") return "La categoría no puede estar vacía.";
   if (categoria.trim().length > MAX_CATEGORIA) return `La categoría puede tener hasta ${MAX_CATEGORIA} caracteres.`;
-  return "";
-}
-
-function errorMonto(monto) {
-  if (monto === undefined) return "Falta el monto.";
-  // "500" (con comillas) es un texto, no un número.
-  if (typeof monto !== "number" || !Number.isFinite(monto)) return "El monto tiene que ser un número.";
-  if (monto <= 0) return "Ingresá un monto mayor a cero.";
-  return "";
-}
-
-// La descripción es optativa: si no viene, queda "".
-function errorDescripcion(descripcion) {
-  if (descripcion === undefined) return "";
-  if (typeof descripcion !== "string") return "La descripción tiene que ser un texto.";
-  if (descripcion.trim().length > MAX_DESCRIPCION) return `La descripción puede tener hasta ${MAX_DESCRIPCION} caracteres.`;
   return "";
 }
 
@@ -62,14 +45,6 @@ function validarCampos(cuerpo) {
 }
 
 // ---- Lo que usa el controlador -----------------------------------------
-
-// :id de la URL. Devuelve { error } o { id } (ya como número).
-export function validarId(texto) {
-  if (!/^[1-9]\d*$/.test(texto)) {
-    return { error: "El id tiene que ser un número entero positivo." };
-  }
-  return { id: Number(texto) };
-}
 
 // POST /api/movimientos: { tipo, categoria, monto, descripcion? }
 export function validarMovimientoNuevo(cuerpo) {

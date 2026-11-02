@@ -18,7 +18,9 @@ import { deudaPeriodo, etiquetaPeriodo, etiquetaCorta } from "../hooks/usePatrim
 //   - resumenActual: qué período se está mirando { tarjetaId, periodoId }
 //   - panelAbierto: null | "resumen" | "consumo" | "tarjeta"
 //   - modal: null | "cerrar" | "pagar" | "eliminar"
-// Los datos financieros vienen siempre por props desde usePatrimonio.
+//   - guardando / errorPanel: espera de la API y su mensaje de error
+// Los datos financieros vienen siempre por props desde usePatrimonio; las
+// acciones son async y, si la API responde un error, lanzan su mensaje.
 // ==========================================================================
 
 
@@ -39,6 +41,7 @@ function Tarjetas({
   categoriasGasto,
   agregarCategoria,
   tarjetas,
+  disponible,
   crearTarjeta,
   agregarConsumoTarjeta,
   editarConsumoTarjeta,
@@ -65,6 +68,11 @@ function Tarjetas({
   const [descripcionConsumo, setDescripcionConsumo] = useState("");
   const [errorConsumo, setErrorConsumo] = useState("");
 
+  // Mientras se espera la respuesta de la API el botón queda deshabilitado
+  // con "Guardando…"; si la API responde un error, se muestra en el panel.
+  const [guardando, setGuardando] = useState(false);
+  const [errorPanel, setErrorPanel] = useState("");
+
   // -- Datos derivados del resumen elegido ---------------------------------
   // Se buscan en los datos actuales para que el panel siempre esté al día.
 
@@ -80,6 +88,7 @@ function Tarjetas({
 
   function abrirResumen(tarjetaId, periodoId) {
     setResumenActual({ tarjetaId, periodoId });
+    setErrorPanel("");
     setPanelAbierto("resumen");
   }
 
@@ -88,16 +97,36 @@ function Tarjetas({
   function cerrarPanel() {
     setPanelAbierto(null);
     setModal(null);
+    setErrorPanel("");
   }
 
   // La flecha "←" y "Cancelar" de los paneles de consumo vuelven al resumen.
   function volverAlResumen() {
     setPanelAbierto("resumen");
     setModal(null);
+    setErrorPanel("");
   }
 
   function cerrarModal() {
     setModal(null);
+  }
+
+  // Llama a la API con "accion" y, si sale bien, ejecuta "despues". Si la
+  // API responde un error, se cierra el modal (si había) y el mensaje queda
+  // en el panel abierto.
+  async function guardarConApi(accion, despues) {
+    if (guardando) return;
+    setGuardando(true);
+    setErrorPanel("");
+    try {
+      await accion();
+      despues();
+    } catch (error) {
+      setModal(null);
+      setErrorPanel(error.message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
   // -- Agregar tarjeta -----------------------------------------------------
@@ -108,11 +137,14 @@ function Tarjetas({
       setErrorTarjeta("Ingresá el nombre de la tarjeta.");
       return;
     }
-    crearTarjeta({ nombre: nombreTarjeta.trim() });
-    setNombreTarjeta("");
-    setLimiteTarjeta("");
-    setErrorTarjeta("");
-    cerrarPanel();
+    guardarConApi(
+      () => crearTarjeta({ nombre: nombreTarjeta.trim() }),
+      () => {
+        setNombreTarjeta("");
+        setLimiteTarjeta("");
+        cerrarPanel();
+      }
+    );
   }
 
   // -- Consumos ------------------------------------------------------------
@@ -123,6 +155,7 @@ function Tarjetas({
     setMontoConsumo("");
     setDescripcionConsumo("");
     setErrorConsumo("");
+    setErrorPanel("");
     setPanelAbierto("consumo");
   }
 
@@ -132,6 +165,7 @@ function Tarjetas({
     setMontoConsumo(String(consumo.monto));
     setDescripcionConsumo(consumo.descripcion);
     setErrorConsumo("");
+    setErrorPanel("");
     setPanelAbierto("consumo");
   }
 
@@ -139,6 +173,14 @@ function Tarjetas({
     evento.preventDefault();
     if (montoConsumo === "" || Number(montoConsumo) <= 0) {
       setErrorConsumo("Ingresá un monto mayor a cero.");
+      return;
+    }
+    // Control previo (el servidor también lo rechaza): un consumo no puede
+    // superar el disponible. Al editar, el monto anterior vuelve a contar.
+    const anterior = consumoEditando === null ? null : periodoResumen.consumos.find((c) => c.id === consumoEditando);
+    const maximo = disponible + (anterior ? anterior.monto : 0);
+    if (Number(montoConsumo) > maximo) {
+      setErrorConsumo("No tenés dinero disponible suficiente para este consumo.");
       return;
     }
 
@@ -149,33 +191,31 @@ function Tarjetas({
       descripcion: descripcionConsumo.trim(),
     };
 
-    if (consumoEditando === null) {
-      agregarConsumoTarjeta(datos);
-    } else {
-      editarConsumoTarjeta({ ...datos, consumoId: consumoEditando });
-    }
-    volverAlResumen();
+    guardarConApi(
+      () => (consumoEditando === null ? agregarConsumoTarjeta(datos) : editarConsumoTarjeta({ ...datos, consumoId: consumoEditando })),
+      volverAlResumen
+    );
   }
 
   function confirmarEliminarConsumo() {
-    eliminarConsumoTarjeta({ tarjetaId: resumenActual.tarjetaId, consumoId: consumoEditando });
-    volverAlResumen();
+    guardarConApi(
+      () => eliminarConsumoTarjeta({ tarjetaId: resumenActual.tarjetaId, consumoId: consumoEditando }),
+      volverAlResumen
+    );
   }
 
   // -- Cerrar y pagar período ---------------------------------------------
 
   function confirmarCerrarPeriodo() {
-    cerrarPeriodo(resumenActual.tarjetaId);
     // El período pasó a CERRADA y se abrió uno nuevo: cerramos el panel.
-    cerrarPanel();
+    guardarConApi(() => cerrarPeriodo(resumenActual.tarjetaId), cerrarPanel);
   }
 
   function confirmarPagarPeriodo() {
-    // El dinero ya está reservado desde cada consumo, así que el pago
-    // siempre se puede hacer (el botón solo aparece en períodos sin pagar).
-    pagarPeriodo(resumenActual.tarjetaId, resumenActual.periodoId);
-    // Volvemos al resumen, que ahora se ve como PAGADA (sin botón de pago).
-    cerrarModal();
+    // El dinero ya está reservado desde cada consumo, así que el pago no
+    // depende del disponible (el botón solo aparece en períodos cerrados).
+    // Después volvemos al resumen, que ahora se ve como PAGADA.
+    guardarConApi(() => pagarPeriodo(resumenActual.tarjetaId, resumenActual.periodoId), cerrarModal);
   }
 
   // -- Historial: períodos que NO están abiertos, más nuevos primero ------
@@ -338,8 +378,8 @@ function Tarjetas({
         onCerrar={cerrarPanel}
         acciones={
           <>
-            <button type="submit" form="form-agregar-tarjeta" className="btn btn--primario">
-              Agregar tarjeta
+            <button type="submit" form="form-agregar-tarjeta" className="btn btn--primario" disabled={guardando}>
+              {guardando ? "Guardando…" : "Agregar tarjeta"}
             </button>
             <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarPanel}>
               Cancelar
@@ -352,6 +392,7 @@ function Tarjetas({
             id="tarjeta-nombre"
             etiqueta="Nombre de la tarjeta"
             placeholder="Ej. Visa"
+            maxLength={30}
             valor={nombreTarjeta}
             onCambio={(nuevo) => {
               setNombreTarjeta(nuevo);
@@ -370,6 +411,7 @@ function Tarjetas({
             onCambio={setLimiteTarjeta}
           />
         </form>
+        {panelAbierto === "tarjeta" && errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
       </PanelLateral>
 
       {/* ---------- Panel: Resumen de tarjeta ---------- */}
@@ -443,6 +485,7 @@ function Tarjetas({
             )}
           </>
         )}
+        {panelAbierto === "resumen" && errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
       </PanelLateral>
 
       {/* ---------- Panel: Agregar / Editar consumo ---------- */}
@@ -454,14 +497,14 @@ function Tarjetas({
         onCerrar={cerrarPanel}
         acciones={
           <>
-            <button type="submit" form="form-consumo" className="btn btn--primario">
-              {consumoEditando === null ? "Agregar consumo" : "Guardar cambios"}
+            <button type="submit" form="form-consumo" className="btn btn--primario" disabled={guardando}>
+              {guardando ? "Guardando…" : consumoEditando === null ? "Agregar consumo" : "Guardar cambios"}
             </button>
             <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={volverAlResumen}>
               Cancelar
             </button>
             {consumoEditando !== null && (
-              <button type="button" className="btn btn--destructivo" onClick={() => setModal("eliminar")}>
+              <button type="button" className="btn btn--destructivo" onClick={() => setModal("eliminar")} disabled={guardando}>
                 Eliminar consumo
               </button>
             )}
@@ -494,10 +537,12 @@ function Tarjetas({
             id="consumo-descripcion"
             etiqueta="Descripción (opcional)"
             placeholder="Ej. Compra de alimentos"
+            maxLength={100}
             valor={descripcionConsumo}
             onCambio={setDescripcionConsumo}
           />
         </form>
+        {panelAbierto === "consumo" && errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}
       </PanelLateral>
 
       {/* ---------- Modales de confirmación (textos del diseño en Figma) ---------- */}
@@ -512,11 +557,11 @@ function Tarjetas({
               cerrado, no podrás agregar nuevos consumos a este período.
             </p>
             <div className="modal__acciones">
-              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal}>
+              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
                 Cancelar
               </button>
-              <button type="button" className="btn btn--primario" onClick={confirmarCerrarPeriodo}>
-                Cerrar período
+              <button type="button" className="btn btn--primario" onClick={confirmarCerrarPeriodo} disabled={guardando}>
+                {guardando ? "Guardando…" : "Cerrar período"}
               </button>
             </div>
           </div>
@@ -536,11 +581,11 @@ function Tarjetas({
               disponible no cambia y tu patrimonio baja en ese monto.
             </p>
             <div className="modal__acciones">
-              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal}>
+              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
                 Cancelar
               </button>
-              <button type="button" className="btn btn--primario" onClick={confirmarPagarPeriodo}>
-                Pagar período
+              <button type="button" className="btn btn--primario" onClick={confirmarPagarPeriodo} disabled={guardando}>
+                {guardando ? "Guardando…" : "Pagar período"}
               </button>
             </div>
           </div>
@@ -563,7 +608,7 @@ function Tarjetas({
               <span>{formatearMonto(consumoAEliminar.monto)}</span>
             </div>
             <div className="modal__acciones">
-              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal}>
+              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
                 Cancelar
               </button>
               <button
@@ -571,8 +616,9 @@ function Tarjetas({
                 className="btn"
                 style={{ backgroundColor: "var(--color-destructivo-solido)", color: "var(--color-texto-inverso)", border: "none" }}
                 onClick={confirmarEliminarConsumo}
+                disabled={guardando}
               >
-                Eliminar
+                {guardando ? "Guardando…" : "Eliminar"}
               </button>
             </div>
           </div>

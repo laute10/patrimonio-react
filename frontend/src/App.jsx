@@ -152,6 +152,7 @@ function AppInterna({ tema, onCambiarTema }) {
             categoriasIngreso={patrimonio.categoriasIngreso}
             agregarCategoriaIngreso={patrimonio.agregarCategoriaIngreso}
             tarjetas={patrimonio.tarjetas}
+            disponible={patrimonio.disponible}
             crearTarjeta={patrimonio.crearTarjeta}
             agregarConsumoTarjeta={patrimonio.agregarConsumoTarjeta}
             editarConsumoTarjeta={patrimonio.editarConsumoTarjeta}

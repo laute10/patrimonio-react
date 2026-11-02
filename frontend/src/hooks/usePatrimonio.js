@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { ICONOS, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../utils/formato";
-import { efectoMovimiento } from "../utils/reglasPatrimonio";
 import { pedir } from "../utils/api";
 
 // ==========================================================================
@@ -10,8 +9,9 @@ import { pedir } from "../utils/api";
 // (documento de especificación, sección 39: Inicio, Movimientos y
 // Estadísticas deben consultar los mismos datos, no lógica duplicada).
 //
-// Reglas financieras implementadas (sección 4 a 26 del documento); cuánto
-// cambia cada parte está definido en utils/reglasPatrimonio.js:
+// Reglas financieras (sección 4 a 26 del documento). Ahora las aplica el
+// backend (backend/src/reglas/reglasPatrimonio.js); el hook pide cada
+// cambio a la API y actualiza el estado con lo que responde:
 // - Patrimonio Total = Disponible + Ahorros + Reserva de tarjeta
 // - Ingreso/Gasto: cambia Disponible y Patrimonio
 // - Agregar/Retirar ahorro: transferencia interna (Patrimonio no cambia)
@@ -20,14 +20,6 @@ import { pedir } from "../utils/api";
 // - Pagar período: sale de la Reserva; Disponible no cambia y el
 //   Patrimonio baja una sola vez por el monto pagado
 // ==========================================================================
-
-let siguienteIdMovimiento = 100;
-let siguienteIdGenerico = 1000;
-
-function nuevoId() {
-  siguienteIdGenerico += 1;
-  return siguienteIdGenerico;
-}
 
 const MESES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -50,12 +42,6 @@ export function etiquetaCorta(periodo) {
   return `${mes}/${String(periodo.anio).slice(-2)}`;
 }
 
-function siguienteMes(periodo) {
-  return periodo.mes === 11
-    ? { mes: 0, anio: periodo.anio + 1 }
-    : { mes: periodo.mes + 1, anio: periodo.anio };
-}
-
 // La API manda la fecha como texto ISO; la app trabaja con Date.
 function desdeApi(mov) {
   return { ...mov, fecha: new Date(mov.fecha) };
@@ -64,9 +50,8 @@ function desdeApi(mov) {
 function usePatrimonio() {
   // El estado inicial se pide a la API (GET /patrimonio) con fetch dentro
   // de un useEffect, a través de pedir() (utils/api.js).
-  // Los ingresos, los gastos y los ahorros ya se guardan en la API; las
-  // tarjetas siguen siendo locales (se pierden al recargar) hasta que
-  // pasen a usarla.
+  // Todos los cambios (ingresos, gastos, ahorros y tarjetas) se guardan en
+  // la API; solo las categorías propias siguen siendo locales por ahora.
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [intento, setIntento] = useState(0); // al cambiar, se vuelve a pedir
@@ -122,15 +107,6 @@ function usePatrimonio() {
   }, 0);
 
   const patrimonioTotal = disponible + ahorrosTotal + reservaTarjeta;
-
-  // -- Helper interno: agrega un movimiento al historial -----------------
-
-  function agregarMovimiento(datos) {
-    // "La fecha es automática" (secciones 11 y 12 del documento).
-    const nuevo = { id: siguienteIdMovimiento, fecha: new Date(), ...datos };
-    siguienteIdMovimiento += 1;
-    setMovimientos((anteriores) => [nuevo, ...anteriores]);
-  }
 
   // -- Ingresos y gastos (sección 11-12): se guardan en la API ------------
   // Son async: el estado cambia recién cuando la API responde bien, con el
@@ -239,143 +215,70 @@ function usePatrimonio() {
     setMovimientos((anteriores) => anteriores.filter((m) => m.id !== id));
   }
 
-  // -- Tarjetas y períodos (sección 17-26) --------------------------------
+  // -- Tarjetas y períodos (sección 17-26): se guardan en la API ----------
+  // Las reglas las controla el servidor: un solo período abierto, consumos
+  // solo en ese período y sin superar el disponible, cerrar abre el mes
+  // siguiente, y solo se paga un período cerrado.
+  // - Consumo: Disponible BAJA y Reserva SUBE en la misma medida (el
+  //   patrimonio no cambia). La reserva se calcula sola con los consumos.
+  // - Pago: sale de la Reserva; el disponible no cambia y el patrimonio
+  //   baja una sola vez por lo pagado.
+  // Las respuestas traen la tarjeta actualizada y el disponible del
+  // servidor (un consumo de ejemplo puede no tener movimiento, así que no
+  // siempre hay un "efecto" anterior del que partir).
 
-  function periodoAbierto(tarjeta) {
-    return tarjeta.periodos.find((p) => p.estado === "ABIERTA");
+  function aplicarTarjeta({ tarjeta, disponible: disponibleServidor }) {
+    setTarjetas((anteriores) => anteriores.map((t) => (t.id === tarjeta.id ? tarjeta : t)));
+    setDisponible(disponibleServidor);
   }
 
-  // Aplica una función solo al período ABIERTO de una tarjeta.
-  function modificarPeriodoAbierto(tarjetaId, transformar) {
-    setTarjetas((anteriores) =>
-      anteriores.map((tarjeta) =>
-        tarjeta.id !== tarjetaId
-          ? tarjeta
-          : {
-              ...tarjeta,
-              periodos: tarjeta.periodos.map((p) => (p.estado === "ABIERTA" ? transformar(p) : p)),
-            }
-      )
-    );
+  async function crearTarjeta({ nombre }) {
+    const nueva = await pedir("/tarjetas", { metodo: "POST", cuerpo: { nombre } });
+    setTarjetas((anteriores) => [...anteriores, nueva]);
   }
 
-  function crearTarjeta({ nombre }) {
-    const hoy = new Date();
-    setTarjetas((anteriores) => [
-      ...anteriores,
-      {
-        id: nuevoId(),
-        nombre,
-        periodos: [
-          { id: nuevoId(), mes: hoy.getMonth(), anio: hoy.getFullYear(), estado: "ABIERTA", consumos: [] },
-        ],
-      },
-    ]);
+  async function agregarConsumoTarjeta({ tarjetaId, categoria, monto, descripcion }) {
+    const respuesta = await pedir(`/tarjetas/${tarjetaId}/consumos`, {
+      metodo: "POST",
+      cuerpo: { categoria, monto, descripcion },
+    });
+    aplicarTarjeta(respuesta);
+    setMovimientos((anteriores) => [desdeApi(respuesta.movimiento), ...anteriores]);
   }
 
-  function agregarConsumoTarjeta({ tarjetaId, categoria, monto, descripcion }) {
-    // Sección 24: Disponible BAJA y Reserva SUBE en la misma medida,
-    // por eso el Patrimonio total no cambia.
-    const consumoId = nuevoId();
-    const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
-    const datos = {
-      tipo: "tarjeta-consumo",
-      categoria: tarjeta ? tarjeta.nombre : "",
-      descripcion,
-      monto,
-      signo: null, // transferencia a "reservado", no afecta el patrimonio
-      consumoId, // vínculo para mantener el movimiento sincronizado
-    };
-    // La reserva sube sola: se calcula sumando los consumos del período.
-    const efecto = efectoMovimiento(datos);
-    setDisponible((actual) => actual + efecto.disponible);
-    modificarPeriodoAbierto(tarjetaId, (p) => ({
-      ...p,
-      consumos: [...p.consumos, { id: consumoId, categoria, descripcion, monto }],
-    }));
-    agregarMovimiento(datos);
+  async function editarConsumoTarjeta({ tarjetaId, consumoId, categoria, monto, descripcion }) {
+    const respuesta = await pedir(`/tarjetas/${tarjetaId}/consumos/${consumoId}`, {
+      metodo: "PUT",
+      cuerpo: { categoria, monto, descripcion },
+    });
+    aplicarTarjeta(respuesta);
+    if (respuesta.movimiento) {
+      setMovimientos((anteriores) =>
+        anteriores.map((mov) => (mov.consumoId === consumoId ? desdeApi(respuesta.movimiento) : mov))
+      );
+    }
   }
 
-  function editarConsumoTarjeta({ tarjetaId, consumoId, categoria, monto, descripcion }) {
-    const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
-    const abierto = tarjeta && periodoAbierto(tarjeta);
-    const anterior = abierto && abierto.consumos.find((c) => c.id === consumoId);
-    if (!anterior) return;
-
-    // Si el monto sube, baja Disponible y sube la deuda (y al revés).
-    const consumo = { tipo: "tarjeta-consumo" };
-    const impacto =
-      efectoMovimiento({ ...consumo, monto }).disponible - efectoMovimiento({ ...consumo, monto: anterior.monto }).disponible;
-    setDisponible((actual) => actual + impacto);
-    modificarPeriodoAbierto(tarjetaId, (p) => ({
-      ...p,
-      consumos: p.consumos.map((c) => (c.id === consumoId ? { ...c, categoria, monto, descripcion } : c)),
-    }));
-    setMovimientos((anteriores) =>
-      anteriores.map((mov) => (mov.consumoId === consumoId ? { ...mov, monto, descripcion } : mov))
-    );
-  }
-
-  function eliminarConsumoTarjeta({ tarjetaId, consumoId }) {
-    const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
-    const abierto = tarjeta && periodoAbierto(tarjeta);
-    const consumo = abierto && abierto.consumos.find((c) => c.id === consumoId);
-    if (!consumo) return;
-
-    // El dinero reservado vuelve a estar disponible (se deshace el consumo).
-    const impacto = -efectoMovimiento({ tipo: "tarjeta-consumo", monto: consumo.monto }).disponible;
-    setDisponible((actual) => actual + impacto);
-    modificarPeriodoAbierto(tarjetaId, (p) => ({
-      ...p,
-      consumos: p.consumos.filter((c) => c.id !== consumoId),
-    }));
+  async function eliminarConsumoTarjeta({ tarjetaId, consumoId }) {
+    const respuesta = await pedir(`/tarjetas/${tarjetaId}/consumos/${consumoId}`, { metodo: "DELETE" });
+    aplicarTarjeta(respuesta);
     setMovimientos((anteriores) => anteriores.filter((mov) => mov.consumoId !== consumoId));
   }
 
-  function cerrarPeriodo(tarjetaId) {
-    // Cierre manual (sección 20): el período ABIERTO pasa a CERRADA y se
-    // abre automáticamente el del mes siguiente. Solo hay uno abierto.
-    setTarjetas((anteriores) =>
-      anteriores.map((tarjeta) => {
-        if (tarjeta.id !== tarjetaId) return tarjeta;
-        const abierto = periodoAbierto(tarjeta);
-        if (!abierto) return tarjeta;
-        const proximo = siguienteMes(abierto);
-        return {
-          ...tarjeta,
-          periodos: [
-            ...tarjeta.periodos.map((p) => (p.id === abierto.id ? { ...p, estado: "CERRADA" } : p)),
-            { id: nuevoId(), ...proximo, estado: "ABIERTA", consumos: [] },
-          ],
-        };
-      })
-    );
+  // Cierre manual (sección 20): el período ABIERTO pasa a CERRADA y se abre
+  // el del mes siguiente.
+  async function cerrarPeriodo(tarjetaId) {
+    const respuesta = await pedir(`/tarjetas/${tarjetaId}/cierre`, { metodo: "POST" });
+    aplicarTarjeta(respuesta);
   }
 
-  // Devuelve true si se pagó, false si el período no existe o ya estaba pagado.
-  // No hace falta controlar el disponible: el dinero quedó reservado con
-  // cada consumo. Al pasar a PAGADA, el período deja de sumar a la Reserva.
-  function pagarPeriodo(tarjetaId, periodoId) {
-    const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
-    const periodo = tarjeta && tarjeta.periodos.find((p) => p.id === periodoId);
-    if (!periodo || periodo.estado === "PAGADA") return false;
-
-    const deuda = deudaPeriodo(periodo);
-    setTarjetas((anteriores) =>
-      anteriores.map((t) =>
-        t.id !== tarjetaId
-          ? t
-          : { ...t, periodos: t.periodos.map((p) => (p.id === periodoId ? { ...p, estado: "PAGADA" } : p)) }
-      )
-    );
-    agregarMovimiento({
-      tipo: "tarjeta-pago",
-      categoria: `Pago ${tarjeta.nombre} - ${etiquetaPeriodo(periodo)}`,
-      descripcion: "",
-      monto: deuda,
-      signo: "-",
-    });
-    return true;
+  async function pagarPeriodo(tarjetaId, periodoId) {
+    const respuesta = await pedir(`/tarjetas/${tarjetaId}/periodos/${periodoId}/pago`, { metodo: "POST" });
+    aplicarTarjeta(respuesta);
+    // Un período sin consumos se paga sin registrar un movimiento de $0.
+    if (respuesta.movimiento) {
+      setMovimientos((anteriores) => [desdeApi(respuesta.movimiento), ...anteriores]);
+    }
   }
 
   // Suma una categoría propia de gasto (si no existe ya, sin distinguir

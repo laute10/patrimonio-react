@@ -5,6 +5,7 @@ import patrimonioRouter from "./routes/patrimonio.js";
 import movimientosRouter from "./routes/movimientos.js";
 import objetivosRouter from "./routes/objetivos.js";
 import tarjetasRouter from "./routes/tarjetas.js";
+import categoriasRouter from "./routes/categorias.js";
 import { inicializarDatos } from "./servicios/datos.js";
 import registro from "./middlewares/registro.js";
 import noEncontrado from "./middlewares/noEncontrado.js";
@@ -31,6 +32,7 @@ app.use("/api/patrimonio", patrimonioRouter);
 app.use("/api/movimientos", movimientosRouter);
 app.use("/api/objetivos", objetivosRouter);
 app.use("/api/tarjetas", tarjetasRouter);
+app.use("/api/categorias", categoriasRouter);
 
 app.use(noEncontrado);
 app.use(manejoErrores);

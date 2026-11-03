@@ -6,7 +6,6 @@ Proyecto final de **Programación 4** · Universidad Champagnat · Prof. Lic. Ig
 **Integrantes:** Lautaro Espejo
 
 - 🎨 Prototipo en Figma: https://www.figma.com/design/mAGqEaUlhmfvLpwQLg1DWA/Design-System-Patrimonio
-- 📊 Presentación: [COMPLETAR]
 - 🌐 Versión anterior publicada (Ejercitación 4.1, solo interfaz): https://patrimonio-react-laute.netlify.app
 - 📄 Sitio anterior (HTML, CSS y JS, Ejercitación 3.1): https://github.com/laute10/patrimonio-web
 

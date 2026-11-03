@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Overlay from "../components/Overlay";
 import PanelLateral from "../components/PanelLateral";
+import Modal from "../components/Modal";
 import SelectorCategoria from "../components/SelectorCategoria";
 import CampoFormulario from "../components/CampoFormulario";
 import { deudaPeriodo, etiquetaPeriodo, etiquetaCorta } from "../hooks/usePatrimonio";
@@ -12,7 +13,8 @@ import { deudaPeriodo, etiquetaPeriodo, etiquetaCorta } from "../hooks/usePatrim
 //     PAGAR / PAGADO)
 //   - "Agregar consumo" y "Editar consumo" son otros paneles, con flecha
 //     "←" para volver al resumen
-//   - cerrar período, pagar período y eliminar consumo son MODALES
+//   - cerrar período, pagar período y eliminar consumo son MODALES (el
+//     componente Modal: role="dialog" y aria-modal)
 //
 // Estado propio de la página (solo de pantalla, no financiero):
 //   - resumenActual: qué período se está mirando { tarjetaId, periodoId }
@@ -535,83 +537,59 @@ function Tarjetas({
 
       {/* ---------- Modales de confirmación (textos del diseño en Figma) ---------- */}
       {modal === "cerrar" && periodoResumen && (
-        <>
-        <Overlay visible alto onClick={cerrarModal} />
-        <div className="modal">
-          <div className="modal__contenido">
-            <p className="modal__titulo">¿Cerrar período?</p>
-            <p className="modal__texto">
-              Vas a cerrar el período {mesResumen} con una deuda de {formatearMonto(deudaResumen)}. Una vez
-              cerrado, no podrás agregar nuevos consumos a este período.
-            </p>
-            <div className="modal__acciones">
-              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn--primario" onClick={confirmarCerrarPeriodo} disabled={guardando}>
-                {guardando ? "Guardando…" : "Cerrar período"}
-              </button>
-            </div>
+        <Modal titulo="¿Cerrar período?" onCerrar={cerrarModal}>
+          <p className="modal__texto">
+            Vas a cerrar el período {mesResumen} con una deuda de {formatearMonto(deudaResumen)}. Una vez
+            cerrado, no podrás agregar nuevos consumos a este período.
+          </p>
+          <div className="modal__acciones">
+            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
+              Cancelar
+            </button>
+            <button type="button" className="btn btn--primario" onClick={confirmarCerrarPeriodo} disabled={guardando}>
+              {guardando ? "Guardando…" : "Cerrar período"}
+            </button>
           </div>
-        </div>
-        </>
+        </Modal>
       )}
 
       {modal === "pagar" && periodoResumen && (
-        <>
-        <Overlay visible alto onClick={cerrarModal} />
-        <div className="modal">
-          <div className="modal__contenido">
-            <p className="modal__titulo">¿Pagar período?</p>
-            <p className="modal__texto">
-              Vas a pagar {formatearMonto(deudaResumen)} correspondientes al período {mesResumen} de tu
-              tarjeta {tarjetaResumen.nombre}. El pago sale de la reserva de la tarjeta: tu dinero
-              disponible no cambia y tu patrimonio baja en ese monto.
-            </p>
-            <div className="modal__acciones">
-              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn--primario" onClick={confirmarPagarPeriodo} disabled={guardando}>
-                {guardando ? "Guardando…" : "Pagar período"}
-              </button>
-            </div>
+        <Modal titulo="¿Pagar período?" onCerrar={cerrarModal}>
+          <p className="modal__texto">
+            Vas a pagar {formatearMonto(deudaResumen)} correspondientes al período {mesResumen} de tu
+            tarjeta {tarjetaResumen.nombre}. El pago sale de la reserva de la tarjeta: tu dinero
+            disponible no cambia y tu patrimonio baja en ese monto.
+          </p>
+          <div className="modal__acciones">
+            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
+              Cancelar
+            </button>
+            <button type="button" className="btn btn--primario" onClick={confirmarPagarPeriodo} disabled={guardando}>
+              {guardando ? "Guardando…" : "Pagar período"}
+            </button>
           </div>
-        </div>
-        </>
+        </Modal>
       )}
 
       {modal === "eliminar" && consumoAEliminar && (
-        <>
-        <Overlay visible alto onClick={cerrarModal} />
-        <div className="modal">
-          <div className="modal__contenido">
-            <p className="modal__titulo">¿Eliminar consumo?</p>
-            <p className="modal__texto" style={{ marginBottom: "var(--espacio-4)" }}>
-              Vas a eliminar el consumo de {formatearMonto(consumoAEliminar.monto)} de tu tarjeta{" "}
-              {tarjetaResumen.nombre}. Esta acción devolverá ese dinero a tu dinero disponible.
-            </p>
-            <div className="modal__detalle">
-              <span>{consumoAEliminar.categoria}</span>
-              <span>{formatearMonto(consumoAEliminar.monto)}</span>
-            </div>
-            <div className="modal__acciones">
-              <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="btn"
-                style={{ backgroundColor: "var(--color-destructivo-solido)", color: "var(--color-texto-inverso)", border: "none" }}
-                onClick={confirmarEliminarConsumo}
-                disabled={guardando}
-              >
-                {guardando ? "Guardando…" : "Eliminar"}
-              </button>
-            </div>
+        <Modal titulo="¿Eliminar consumo?" onCerrar={cerrarModal}>
+          <p className="modal__texto" style={{ marginBottom: "var(--espacio-4)" }}>
+            Vas a eliminar el consumo de {formatearMonto(consumoAEliminar.monto)} de tu tarjeta{" "}
+            {tarjetaResumen.nombre}. Esta acción devolverá ese dinero a tu dinero disponible.
+          </p>
+          <div className="modal__detalle">
+            <span>{consumoAEliminar.categoria}</span>
+            <span>{formatearMonto(consumoAEliminar.monto)}</span>
           </div>
-        </div>
-        </>
+          <div className="modal__acciones">
+            <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cerrarModal} disabled={guardando}>
+              Cancelar
+            </button>
+            <button type="button" className="btn btn--destructivo" onClick={confirmarEliminarConsumo} disabled={guardando}>
+              {guardando ? "Guardando…" : "Eliminar"}
+            </button>
+          </div>
+        </Modal>
       )}
     </main>
   );

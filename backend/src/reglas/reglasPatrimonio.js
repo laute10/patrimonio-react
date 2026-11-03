@@ -1,10 +1,9 @@
 // ==========================================================================
 // reglasPatrimonio - cuánto cambia cada parte del patrimonio con un
-// movimiento. Copia de frontend/src/utils/reglasPatrimonio.js: el backend
-// pasa a ser el dueño de las reglas y la copia del frontend se borra cuando
-// todas las acciones usen la API. Hasta entonces, si se cambia una regla,
-// hay que cambiarla en los dos archivos.
-// Cada movimiento que devuelve la API lleva su "efecto" calculado acá.
+// movimiento. Es la ÚNICA definición de las reglas de toda la app: la usan
+// los controladores para aplicar cada acción, y cada movimiento que
+// devuelve la API lleva su "efecto" calculado acá (el frontend lo usa para
+// el gráfico de progreso sin repetir las reglas).
 // Función pura: no lee ni modifica nada.
 //
 // Patrimonio = Disponible + Ahorros + Reserva de tarjeta

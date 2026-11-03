@@ -1,12 +1,11 @@
-import { efectoMovimiento } from "./reglasPatrimonio";
-
 // ==========================================================================
 // historialPatrimonio - reconstruye cómo fue cambiando el patrimonio.
 //
 // El historial no se guarda: se parte de los valores de HOY y se va hacia
-// atrás deshaciendo cada movimiento con las mismas reglas que usa
-// usePatrimonio (efectoMovimiento). El saldo en un momento es el de hoy
-// menos todo lo que pasó después de ese momento.
+// atrás deshaciendo cada movimiento. Cuánto cambió cada parte lo dice el
+// campo "efecto" que manda el servidor con cada movimiento (las reglas
+// viven solo en el backend). El saldo en un momento es el de hoy menos
+// todo lo que pasó después de ese momento.
 //
 // Función pura: recibe datos y devuelve datos, sin React y sin cambiar nada.
 // ==========================================================================
@@ -21,7 +20,7 @@ function saldoEn(momento, actuales, movimientos) {
   const saldo = { ...actuales };
   for (const mov of movimientos) {
     if (mov.fecha >= momento) {
-      const efecto = efectoMovimiento(mov);
+      const { efecto } = mov;
       saldo.disponible -= efecto.disponible;
       saldo.ahorros -= efecto.ahorros;
       saldo.reserva -= efecto.reserva;

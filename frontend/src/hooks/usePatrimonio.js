@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ICONOS, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../utils/formato";
-import { pedir } from "../utils/api";
+import { pedir, movimientoDesdeApi } from "../utils/api";
 
 // ==========================================================================
 // usePatrimonio - estado financiero compartido de toda la app.
@@ -42,11 +42,6 @@ export function etiquetaCorta(periodo) {
   return `${mes}/${String(periodo.anio).slice(-2)}`;
 }
 
-// La API manda la fecha como texto ISO; la app trabaja con Date.
-function desdeApi(mov) {
-  return { ...mov, fecha: new Date(mov.fecha) };
-}
-
 function usePatrimonio() {
   // El estado inicial se pide a la API (GET /patrimonio) con fetch dentro
   // de un useEffect, a través de pedir() (utils/api.js).
@@ -76,7 +71,7 @@ function usePatrimonio() {
           }))
         );
         setTarjetas(datos.tarjetas);
-        setMovimientos(datos.movimientos.map(desdeApi));
+        setMovimientos(datos.movimientos.map(movimientoDesdeApi));
         setCategoriasPropias(datos.categoriasPropias.gasto);
         setCategoriasIngresoPropias(datos.categoriasPropias.ingreso);
         setCargando(false);
@@ -120,7 +115,7 @@ function usePatrimonio() {
       cuerpo: { tipo, categoria, monto, descripcion },
     });
     setDisponible((actual) => actual + nuevo.efecto.disponible);
-    setMovimientos((anteriores) => [desdeApi(nuevo), ...anteriores]);
+    setMovimientos((anteriores) => [movimientoDesdeApi(nuevo), ...anteriores]);
   }
 
   function registrarIngreso(datos) {
@@ -166,7 +161,7 @@ function usePatrimonio() {
     });
     setDisponible((actual) => actual + movimiento.efecto.disponible);
     setObjetivos((anteriores) => anteriores.map((obj) => (obj.id === objetivoId ? objetivo : obj)));
-    setMovimientos((anteriores) => [desdeApi(movimiento), ...anteriores]);
+    setMovimientos((anteriores) => [movimientoDesdeApi(movimiento), ...anteriores]);
   }
 
   function agregarAhorro(datos) {
@@ -203,7 +198,7 @@ function usePatrimonio() {
     // Lo que cambia el disponible es el efecto nuevo menos el que tenía
     // (los dos los calculó el servidor).
     setDisponible((actual) => actual + actualizado.efecto.disponible - anterior.efecto.disponible);
-    setMovimientos((anteriores) => anteriores.map((m) => (m.id === id ? desdeApi(actualizado) : m)));
+    setMovimientos((anteriores) => anteriores.map((m) => (m.id === id ? movimientoDesdeApi(actualizado) : m)));
   }
 
   async function eliminarMovimiento(id) {
@@ -243,7 +238,7 @@ function usePatrimonio() {
       cuerpo: { categoria, monto, descripcion },
     });
     aplicarTarjeta(respuesta);
-    setMovimientos((anteriores) => [desdeApi(respuesta.movimiento), ...anteriores]);
+    setMovimientos((anteriores) => [movimientoDesdeApi(respuesta.movimiento), ...anteriores]);
   }
 
   async function editarConsumoTarjeta({ tarjetaId, consumoId, categoria, monto, descripcion }) {
@@ -254,7 +249,7 @@ function usePatrimonio() {
     aplicarTarjeta(respuesta);
     if (respuesta.movimiento) {
       setMovimientos((anteriores) =>
-        anteriores.map((mov) => (mov.consumoId === consumoId ? desdeApi(respuesta.movimiento) : mov))
+        anteriores.map((mov) => (mov.consumoId === consumoId ? movimientoDesdeApi(respuesta.movimiento) : mov))
       );
     }
   }
@@ -277,7 +272,7 @@ function usePatrimonio() {
     aplicarTarjeta(respuesta);
     // Un período sin consumos se paga sin registrar un movimiento de $0.
     if (respuesta.movimiento) {
-      setMovimientos((anteriores) => [desdeApi(respuesta.movimiento), ...anteriores]);
+      setMovimientos((anteriores) => [movimientoDesdeApi(respuesta.movimiento), ...anteriores]);
     }
   }
 

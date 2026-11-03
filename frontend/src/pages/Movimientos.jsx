@@ -1,7 +1,8 @@
 import { IconoCerrar, IconoTipoMovimiento } from "../components/Iconos";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PanelMovimiento from "../components/PanelMovimiento";
 import { clasificar, formatearMonto, formatearTipo } from "../utils/formato";
+import { pedir, movimientoDesdeApi } from "../utils/api";
 
 // ==========================================================================
 // Movimientos - listado completo con:
@@ -12,7 +13,28 @@ import { clasificar, formatearMonto, formatearTipo } from "../utils/formato";
 //   - detalle de cada movimiento en un panel lateral.
 // Puede abrirse ya filtrado desde otra pantalla (por ejemplo, desde un
 // objetivo): esos filtros llegan por la prop "filtroInicial".
+//
+// El filtro lo hace el servidor: cada vez que cambia un filtro aplicado se
+// pide GET /movimientos con un query string (?tipo=&objetivoId=&desde=
+// &hasta=&q=). La lista que llega es solo de esta pantalla; los totales
+// de Inicio y Estadísticas siguen saliendo de usePatrimonio.
 // ==========================================================================
+
+// Cuánto se espera después de la última tecla antes de pedir la búsqueda
+// (así no se manda un pedido por cada letra).
+const ESPERA_BUSQUEDA = 300;
+
+// Arma el query string solo con los filtros que tienen valor.
+function armarConsulta({ tipo, objetivoId, desde, hasta, busqueda }) {
+  const parametros = new URLSearchParams();
+  if (tipo !== "todos") parametros.set("tipo", tipo);
+  if (objetivoId !== "todos") parametros.set("objetivoId", objetivoId);
+  if (desde !== "") parametros.set("desde", desde);
+  if (hasta !== "") parametros.set("hasta", hasta);
+  if (busqueda.trim() !== "") parametros.set("q", busqueda.trim());
+  const texto = parametros.toString();
+  return texto === "" ? "" : "?" + texto;
+}
 
 const TIPOS = [
   { id: "todos", texto: "Todos" },
@@ -24,13 +46,6 @@ const TIPOS = [
 
 function formatearFecha(fecha) {
   return fecha.toLocaleDateString("es-AR", { day: "2-digit", month: "long" });
-}
-
-// "2026-09-01" -> Date a las 00:00 locales (sin corrimiento de zona horaria)
-function fechaDesdeCampo(texto, finDeDia) {
-  if (texto === "") return null;
-  const [anio, mes, dia] = texto.split("-").map(Number);
-  return finDeDia ? new Date(anio, mes - 1, dia, 23, 59, 59) : new Date(anio, mes - 1, dia);
 }
 
 function Movimientos({
@@ -64,6 +79,44 @@ function Movimientos({
   const [errorFechas, setErrorFechas] = useState("");
 
   const [seleccionadoId, setSeleccionadoId] = useState(null);
+
+  // Lo que devolvió el servidor y para qué consulta: { consulta, lista }.
+  // null = todavía no llegó nada.
+  const [respuesta, setRespuesta] = useState(null);
+  const [errorLista, setErrorLista] = useState("");
+  const [intento, setIntento] = useState(0); // al cambiar, se vuelve a pedir
+
+  const consulta = armarConsulta({ tipo, objetivoId, desde, hasta, busqueda });
+  const lista = respuesta ? respuesta.lista : null;
+  // "Buscando…" mientras la lista que se ve es de otra consulta.
+  const buscando = respuesta !== null && respuesta.consulta !== consulta;
+
+  // Se vuelve a pedir cuando cambia la consulta, cuando se toca
+  // "Reintentar" y cuando cambian los movimientos de usePatrimonio (por
+  // ejemplo, al editar o eliminar uno desde el panel de detalle).
+  useEffect(() => {
+    let cancelado = false; // si llega una respuesta vieja, se descarta
+    const espera = setTimeout(() => {
+      pedir("/movimientos" + consulta)
+        .then((datos) => {
+          if (cancelado) return;
+          setRespuesta({ consulta, lista: datos.map(movimientoDesdeApi) });
+          setErrorLista("");
+        })
+        .catch((error) => {
+          if (!cancelado) setErrorLista(error.message);
+        });
+    }, ESPERA_BUSQUEDA);
+    return () => {
+      cancelado = true;
+      clearTimeout(espera);
+    };
+  }, [consulta, movimientos, intento]);
+
+  function reintentar() {
+    setErrorLista("");
+    setIntento(intento + 1);
+  }
 
   function alternarFiltros() {
     if (!filtrosAbiertos) {
@@ -105,22 +158,9 @@ function Movimientos({
     if (nuevoTipo !== "ahorro") setObjetivoId("todos");
   }
 
-  const texto = busqueda.toLowerCase().trim();
-  const fechaDesde = fechaDesdeCampo(desde, false);
-  const fechaHasta = fechaDesdeCampo(hasta, true);
-
-  const movimientosFiltrados = movimientos.filter((mov) => {
-    const coincideTipo = tipo === "todos" || clasificar(mov.tipo) === tipo;
-    const coincideObjetivo = objetivoId === "todos" || mov.objetivoId === Number(objetivoId);
-    const coincideTexto = (mov.categoria + " " + mov.descripcion).toLowerCase().includes(texto);
-    const coincideDesde = fechaDesde === null || mov.fecha >= fechaDesde;
-    const coincideHasta = fechaHasta === null || mov.fecha <= fechaHasta;
-    return coincideTipo && coincideObjetivo && coincideTexto && coincideDesde && coincideHasta;
-  });
-
-  // Agrupa por día conservando el orden (más reciente primero).
+  // Agrupa por día conservando el orden del servidor (más reciente primero).
   const grupos = [];
-  movimientosFiltrados.forEach((mov) => {
+  (lista ?? []).forEach((mov) => {
     const clave = formatearFecha(mov.fecha);
     let grupo = grupos.find((g) => g.clave === clave);
     if (!grupo) {
@@ -131,6 +171,7 @@ function Movimientos({
   });
 
   const objetivoFiltrado = objetivos.find((obj) => obj.id === Number(objetivoId));
+  // El detalle sale de usePatrimonio (tiene el estado más reciente).
   const movimientoSeleccionado = movimientos.find((mov) => mov.id === seleccionadoId);
 
   return (
@@ -225,7 +266,25 @@ function Movimientos({
         )}
       </section>
 
-      {grupos.length === 0 ? (
+      {/* Siempre presente para que el lector de pantalla anuncie la búsqueda. */}
+      <p className="subtitulo" role="status">
+        {buscando && errorLista === "" ? "Buscando…" : ""}
+      </p>
+
+      {errorLista !== "" ? (
+        <section className="estado-vacio" role="alert">
+          <div className="estado-vacio__icono">!</div>
+          <p className="estado-vacio__titulo">No se pudieron cargar los movimientos</p>
+          <p className="estado-vacio__subtitulo">{errorLista}</p>
+          <button type="button" className="btn btn--primario btn--chico" onClick={reintentar}>
+            Reintentar
+          </button>
+        </section>
+      ) : lista === null ? (
+        <section className="estado-vacio">
+          <p className="estado-vacio__titulo">Cargando movimientos…</p>
+        </section>
+      ) : grupos.length === 0 ? (
         <section className="estado-vacio">
           <div className="estado-vacio__icono">!</div>
           <p className="estado-vacio__titulo">No hay movimientos</p>

@@ -9,6 +9,12 @@
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// La API manda la fecha de cada movimiento como texto ISO; la app trabaja
+// con Date.
+export function movimientoDesdeApi(mov) {
+  return { ...mov, fecha: new Date(mov.fecha) };
+}
+
 // ruta: "/patrimonio", "/movimientos/3"...
 // cuerpo: objeto que se envía como JSON (para POST y PUT).
 export async function pedir(ruta, { metodo = "GET", cuerpo } = {}) {

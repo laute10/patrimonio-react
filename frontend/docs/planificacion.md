@@ -48,7 +48,8 @@ Ver `arbol-de-componentes.svg`. No se edita a mano: se regenera con `npm run arb
 | `menuAbierto` | `Header` | menú hamburguesa en celular |
 | `panelAbierto`, `modal` | cada pantalla | qué panel o modal está abierto |
 | campos y errores del formulario | cada formulario | formularios controlados |
-| filtros y búsqueda | `Movimientos`, `Tarjetas` | filtrar la lista |
+| filtros y búsqueda | `Movimientos`, `Tarjetas` | filtrar la lista (en Movimientos, con `GET /api/movimientos?tipo=&objetivoId=&desde=&hasta=&q=`) |
+| `respuesta`, `errorLista`, `intento` | `Movimientos` | lista filtrada que devuelve el servidor, su error y "Reintentar" |
 
 **Props (pasan de un componente a otro)**
 

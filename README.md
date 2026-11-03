@@ -20,6 +20,20 @@ Muchas personas no saben cuánto dinero tienen realmente disponible, porque una 
 - Agregar o retirar ahorro mueve dinero entre el disponible y un objetivo (el patrimonio no cambia). Utilizar un ahorro es un gasto real.
 - Una compra con tarjeta pasa dinero del disponible a la reserva. Pagar el período sale de la reserva: el disponible no cambia y el patrimonio baja una sola vez.
 
+## Pantallas
+
+Todos los datos financieros (movimientos, ahorros, tarjetas y categorías propias) se guardan en el servidor y siguen ahí al recargar la página o reiniciar el backend. Lo único simulado es la sesión.
+
+| Pantalla | Qué permite |
+|---|---|
+| Iniciar sesión, Crear cuenta y Recuperar contraseña | Formularios con validación por campo (la sesión es simulada) |
+| Inicio | Ver el patrimonio, registrar gastos e ingresos (con categorías propias) y ver los últimos movimientos |
+| Ahorros | Crear objetivos, ver todos y, en el detalle de cada uno, agregar, retirar o utilizar dinero, editarlo y eliminarlo |
+| Tarjetas | Crear tarjetas, cargar, editar y eliminar consumos, cerrar y pagar períodos, filtrar el historial |
+| Movimientos | Buscar y filtrar todos los movimientos (el filtro lo hace el servidor), ver el detalle y editar o eliminar ingresos y gastos |
+| Estadísticas | Gráficos por período y progreso del patrimonio, calculados con los movimientos guardados |
+| Configuración | Editar nombre y correo (forman parte de la sesión simulada), elegir tema claro u oscuro (se recuerda en el navegador) y cerrar sesión con confirmación |
+
 ## Cómo está armado
 
 El repositorio tiene dos partes, cada una con su propio `package.json`:
@@ -191,6 +205,10 @@ frontend/
 │   └── components/          paneles, modales, formularios y gráficos
 └── docs/                    planificación, árbol de componentes y capturas de la API
 ```
+
+## Planificación
+
+El árbol de componentes, los componentes reutilizables y qué es estado y qué es props están en `frontend/docs/`: [`arbol-de-componentes.svg`](frontend/docs/arbol-de-componentes.svg) y [`planificacion.md`](frontend/docs/planificacion.md). El árbol se regenera desde el código con `npm run arbol` (en `frontend/`).
 
 ## Pruebas de la API
 

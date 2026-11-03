@@ -1064,6 +1064,10 @@ button.consumo-fila:hover {
 }
 
 .barra-progreso__relleno {
+  /* En TarjetaObjetivo el relleno es un <span> (va dentro de un <button>,
+     donde no puede haber un <div>). Un span es inline y el navegador le
+     ignora width y height: sin esto la barra se dibuja vacía. */
+  display: block;
   height: 100%;
   background-color: var(--color-primario);
   border-radius: 4px;

@@ -3,8 +3,10 @@ import { useState } from "react";
 // ==========================================================================
 // SelectorCategoria - lista de categorías con la opción "Nueva categoría…".
 // Al elegirla aparece un campo para escribir el nombre; al confirmarlo se
-// avisa al padre (onNueva guarda la categoría para próximas veces y devuelve
-// el nombre final) y queda seleccionada. Es un componente controlado.
+// avisa al padre (onNueva guarda la categoría en la API y devuelve el nombre
+// final) y queda seleccionada. Es un componente controlado.
+// onNueva es async: mientras responde la API el botón dice "Guardando…", y
+// si falla se muestra el mensaje del servidor debajo del campo.
 // ==========================================================================
 
 const NUEVA = "__nueva__";
@@ -13,8 +15,10 @@ function SelectorCategoria({ id, categorias, valor, onCambio, onNueva }) {
   const [creando, setCreando] = useState(false);
   const [nombre, setNombre] = useState("");
   const [error, setError] = useState("");
+  const [guardando, setGuardando] = useState(false);
 
-  function confirmar() {
+  async function confirmar() {
+    if (guardando) return;
     const limpio = nombre.trim();
     if (limpio === "") {
       setError("Escribí el nombre de la categoría.");
@@ -24,10 +28,17 @@ function SelectorCategoria({ id, categorias, valor, onCambio, onNueva }) {
       setError("Usá 25 caracteres o menos.");
       return;
     }
-    onCambio(onNueva(limpio));
-    setCreando(false);
-    setNombre("");
-    setError("");
+    setGuardando(true);
+    try {
+      onCambio(await onNueva(limpio));
+      setCreando(false);
+      setNombre("");
+      setError("");
+    } catch (errorApi) {
+      setError(errorApi.message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
   function cancelar() {
@@ -79,8 +90,8 @@ function SelectorCategoria({ id, categorias, valor, onCambio, onNueva }) {
             }}
           />
           <div className="categoria-nueva__acciones">
-            <button type="button" className="btn btn--primario" onClick={confirmar}>
-              Agregar
+            <button type="button" className="btn btn--primario" onClick={confirmar} disabled={guardando}>
+              {guardando ? "Guardando…" : "Agregar"}
             </button>
             <button type="button" className="btn btn--secundario btn--texto-secundario" onClick={cancelar}>
               Cancelar

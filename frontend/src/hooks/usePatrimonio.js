@@ -50,8 +50,8 @@ function desdeApi(mov) {
 function usePatrimonio() {
   // El estado inicial se pide a la API (GET /patrimonio) con fetch dentro
   // de un useEffect, a través de pedir() (utils/api.js).
-  // Todos los cambios (ingresos, gastos, ahorros y tarjetas) se guardan en
-  // la API; solo las categorías propias siguen siendo locales por ahora.
+  // Todos los cambios (ingresos, gastos, ahorros, tarjetas y categorías
+  // propias) se guardan en la API.
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [intento, setIntento] = useState(0); // al cambiar, se vuelve a pedir
@@ -281,27 +281,25 @@ function usePatrimonio() {
     }
   }
 
-  // Suma una categoría propia de gasto (si no existe ya, sin distinguir
-  // mayúsculas). Devuelve el nombre con el que quedó guardada.
-  function agregarCategoria(nombre) {
+  // -- Categorías propias: se guardan en la API ---------------------------
+  // Suma una categoría propia (si no existe ya, sin distinguir mayúsculas)
+  // y devuelve el nombre con el que quedó guardada. Las predeterminadas
+  // están solo en el frontend: si coincide con una, no se llama a la API.
+  async function agregarCategoriaDeTipo(tipo, nombre, predeterminadas, propias, setPropias) {
     const limpio = nombre.trim();
-    const existente = [...CATEGORIAS_GASTO, ...categoriasPropias].find(
-      (c) => c.toLowerCase() === limpio.toLowerCase()
-    );
+    const existente = [...predeterminadas, ...propias].find((c) => c.toLowerCase() === limpio.toLowerCase());
     if (existente) return existente;
-    setCategoriasPropias([...categoriasPropias, limpio]);
-    return limpio;
+    const guardada = await pedir("/categorias", { metodo: "POST", cuerpo: { tipo, nombre: limpio } });
+    setPropias((anteriores) => (anteriores.includes(guardada.nombre) ? anteriores : [...anteriores, guardada.nombre]));
+    return guardada.nombre;
   }
 
-  // Igual que agregarCategoria, pero para las categorías de ingreso.
+  function agregarCategoria(nombre) {
+    return agregarCategoriaDeTipo("gasto", nombre, CATEGORIAS_GASTO, categoriasPropias, setCategoriasPropias);
+  }
+
   function agregarCategoriaIngreso(nombre) {
-    const limpio = nombre.trim();
-    const existente = [...CATEGORIAS_INGRESO, ...categoriasIngresoPropias].find(
-      (c) => c.toLowerCase() === limpio.toLowerCase()
-    );
-    if (existente) return existente;
-    setCategoriasIngresoPropias([...categoriasIngresoPropias, limpio]);
-    return limpio;
+    return agregarCategoriaDeTipo("ingreso", nombre, CATEGORIAS_INGRESO, categoriasIngresoPropias, setCategoriasIngresoPropias);
   }
 
   return {

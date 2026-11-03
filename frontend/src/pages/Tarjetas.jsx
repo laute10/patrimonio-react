@@ -58,7 +58,6 @@ function Tarjetas({
 
   // Formulario "Agregar tarjeta"
   const [nombreTarjeta, setNombreTarjeta] = useState("");
-  const [limiteTarjeta, setLimiteTarjeta] = useState("");
   const [errorTarjeta, setErrorTarjeta] = useState("");
 
   // Formulario de consumo (sirve para agregar y para editar)
@@ -141,7 +140,6 @@ function Tarjetas({
       () => crearTarjeta({ nombre: nombreTarjeta.trim() }),
       () => {
         setNombreTarjeta("");
-        setLimiteTarjeta("");
         cerrarPanel();
       }
     );
@@ -399,16 +397,6 @@ function Tarjetas({
               setErrorTarjeta("");
             }}
             error={errorTarjeta}
-          />
-          <CampoFormulario
-            id="tarjeta-limite"
-            etiqueta="Límite de crédito"
-            tipo="number"
-            placeholder="$ 0"
-            min="0"
-            step="1"
-            valor={limiteTarjeta}
-            onCambio={setLimiteTarjeta}
           />
         </form>
         {panelAbierto === "tarjeta" && errorPanel !== "" && <p className="campo__error" role="alert">{errorPanel}</p>}

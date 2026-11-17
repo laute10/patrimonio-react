@@ -8,6 +8,7 @@ Proyecto final de **Programación 4** · Universidad Champagnat · Prof. Lic. Ig
 - 🌐 Aplicación publicada: https://patrimonio-react-laute.netlify.app
 - 🎨 Prototipo en Figma: https://www.figma.com/design/mAGqEaUlhmfvLpwQLg1DWA/Design-System-Patrimonio
 - 📄 Sitio anterior (HTML, CSS y JS, Ejercitación 3.1): https://github.com/laute10/patrimonio-web
+- 🧩 Versión completa con backend (React + Node.js y Express): https://github.com/laute10/prog4-proyecto-patrimonio-final
 
 ## ¿Qué problema resuelve?
 
